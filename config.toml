@@ -1,0 +1,27 @@
+# The URL the site will be built for
+base_url = "https://example.com"
+
+# Whether to automatically compile all Sass files in the sass directory
+compile_sass = true
+
+# Whether to build a search index to be used later on by a JavaScript library
+build_search_index = false
+
+
+# The site theme to use.
+theme = "even"
+
+taxonomies = [ # even 主题要求的配置
+    # 按自己需要开关 RSS
+    {name = "categories", rss = true},
+    {name = "tags", rss = true},
+]
+
+[markdown]
+# Whether to do syntax highlighting
+# Theme can be customised by setting the `highlight_theme` variable to a theme supported by Zola
+highlight_code = false
+
+[extra]
+even_title = "Yu 的天地" # even 主题页面左上角
+author = "yu7yang"
