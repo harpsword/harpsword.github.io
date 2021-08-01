@@ -1,5 +1,8 @@
 # The URL the site will be built for
-base_url = "https://example.com"
+base_url = "https://harpsword.github.io"
+
+title = "yu's blog"
+description = "兴趣驱动分享"
 
 # Whether to automatically compile all Sass files in the sass directory
 compile_sass = true
@@ -17,6 +20,8 @@ taxonomies = [ # even 主题要求的配置
     {name = "tags", rss = true},
 ]
 
+default_language = "zh"
+
 [markdown]
 # Whether to do syntax highlighting
 # Theme can be customised by setting the `highlight_theme` variable to a theme supported by Zola
@@ -25,3 +30,10 @@ highlight_code = false
 [extra]
 even_title = "Yu 的天地" # even 主题页面左上角
 author = "yu7yang"
+
+even_menu = [
+    {url = "$BASE_URL", name = "Home"},
+    {url = "$BASE_URL/categories", name = "Categories"},
+    {url = "$BASE_URL/tags", name = "Tags"},
+    {url = "$BASE_URL/about", name = "About"},
+]

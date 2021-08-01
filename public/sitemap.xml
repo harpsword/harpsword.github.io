@@ -1,110 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://example.com/</loc>
+        <loc>https://harpsword.github.io/</loc>
     </url>
     <url>
-        <loc>https://example.com/about/</loc>
+        <loc>https://harpsword.github.io/about/</loc>
     </url>
     <url>
-        <loc>https://example.com/categories/</loc>
+        <loc>https://harpsword.github.io/categories/</loc>
     </url>
     <url>
-        <loc>https://example.com/categories/even/</loc>
+        <loc>https://harpsword.github.io/categories/even/</loc>
     </url>
     <url>
-        <loc>https://example.com/categories/hello-world/</loc>
+        <loc>https://harpsword.github.io/categories/hello-world/</loc>
     </url>
     <url>
-        <loc>https://example.com/categories/odd/</loc>
+        <loc>https://harpsword.github.io/categories/odd/</loc>
     </url>
     <url>
-        <loc>https://example.com/categories/prog/</loc>
+        <loc>https://harpsword.github.io/categories/prog/</loc>
     </url>
     <url>
-        <loc>https://example.com/categories/real-content/</loc>
+        <loc>https://harpsword.github.io/categories/real-content/</loc>
     </url>
     <url>
-        <loc>https://example.com/eigth-post/</loc>
+        <loc>https://harpsword.github.io/eigth-post/</loc>
         <lastmod>2018-07-08</lastmod>
     </url>
     <url>
-        <loc>https://example.com/fifth-post/</loc>
+        <loc>https://harpsword.github.io/fifth-post/</loc>
         <lastmod>2018-07-05</lastmod>
     </url>
     <url>
-        <loc>https://example.com/first-post/</loc>
+        <loc>https://harpsword.github.io/first-post/</loc>
         <lastmod>2018-07-01</lastmod>
     </url>
     <url>
-        <loc>https://example.com/fourth-post/</loc>
+        <loc>https://harpsword.github.io/fourth-post/</loc>
         <lastmod>2018-07-04</lastmod>
     </url>
     <url>
-        <loc>https://example.com/markdown-overview/</loc>
+        <loc>https://harpsword.github.io/markdown-overview/</loc>
         <lastmod>2018-07-18</lastmod>
     </url>
     <url>
-        <loc>https://example.com/ninth-post/</loc>
+        <loc>https://harpsword.github.io/ninth-post/</loc>
         <lastmod>2018-07-09</lastmod>
     </url>
     <url>
-        <loc>https://example.com/page/1/</loc>
+        <loc>https://harpsword.github.io/page/1/</loc>
     </url>
     <url>
-        <loc>https://example.com/page/2/</loc>
+        <loc>https://harpsword.github.io/page/2/</loc>
     </url>
     <url>
-        <loc>https://example.com/page/3/</loc>
+        <loc>https://harpsword.github.io/page/3/</loc>
     </url>
     <url>
-        <loc>https://example.com/second-post/</loc>
+        <loc>https://harpsword.github.io/second-post/</loc>
         <lastmod>2018-07-02</lastmod>
     </url>
     <url>
-        <loc>https://example.com/seventh-post/</loc>
+        <loc>https://harpsword.github.io/seventh-post/</loc>
         <lastmod>2018-07-07</lastmod>
     </url>
     <url>
-        <loc>https://example.com/sixth-post/</loc>
+        <loc>https://harpsword.github.io/sixth-post/</loc>
         <lastmod>2018-07-06</lastmod>
     </url>
     <url>
-        <loc>https://example.com/some-article/</loc>
+        <loc>https://harpsword.github.io/some-article/</loc>
         <lastmod>2017-09-24</lastmod>
     </url>
     <url>
-        <loc>https://example.com/some-other-article/</loc>
+        <loc>https://harpsword.github.io/some-other-article/</loc>
         <lastmod>2017-09-25</lastmod>
     </url>
     <url>
-        <loc>https://example.com/tags/</loc>
+        <loc>https://harpsword.github.io/tags/</loc>
     </url>
     <url>
-        <loc>https://example.com/tags/placeholder-posts/</loc>
+        <loc>https://harpsword.github.io/tags/placeholder-posts/</loc>
     </url>
     <url>
-        <loc>https://example.com/tags/prime-number-posts/</loc>
+        <loc>https://harpsword.github.io/tags/prime-number-posts/</loc>
     </url>
     <url>
-        <loc>https://example.com/tags/rust/</loc>
+        <loc>https://harpsword.github.io/tags/rust/</loc>
     </url>
     <url>
-        <loc>https://example.com/tags/ssg/</loc>
+        <loc>https://harpsword.github.io/tags/ssg/</loc>
     </url>
     <url>
-        <loc>https://example.com/tags/tag1/</loc>
+        <loc>https://harpsword.github.io/tags/tag1/</loc>
     </url>
     <url>
-        <loc>https://example.com/tenth-post/</loc>
+        <loc>https://harpsword.github.io/tenth-post/</loc>
         <lastmod>2018-07-10</lastmod>
     </url>
     <url>
-        <loc>https://example.com/theme-overview/</loc>
+        <loc>https://harpsword.github.io/theme-overview/</loc>
         <lastmod>2018-07-19</lastmod>
     </url>
     <url>
-        <loc>https://example.com/third-post/</loc>
+        <loc>https://harpsword.github.io/third-post/</loc>
         <lastmod>2018-07-03</lastmod>
     </url>
 </urlset>
