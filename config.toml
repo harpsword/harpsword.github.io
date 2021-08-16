@@ -25,7 +25,9 @@ default_language = "zh"
 [markdown]
 # Whether to do syntax highlighting
 # Theme can be customised by setting the `highlight_theme` variable to a theme supported by Zola
-highlight_code = false
+#highlight_code = false
+highlight_code = true
+#highlight_theme = "inspired-github"
 
 [extra]
 even_title = "Yu 的天地" # even 主题页面左上角
