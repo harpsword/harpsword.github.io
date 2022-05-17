@@ -26,8 +26,8 @@ enum Result<T, E> {
 ```
 
 ## Option
-Option的定位是处理存在Null的情况，在下述例子中，在字符串中查找某个字符，这个字符可能会不存在，这时候就会返回None
-
+Option的定位是处理存在Null的情况，在下述例子中，在字符串中查找某个字符，这个字符可能会不存在，这时候就会返回None。
+接下来是调用函数find的部分，假如使用match来处理返回结果的话，rust的编译器会强制要求处理所有的情况，包括None和Some两种情况，这样不容易出错，比如遗漏了找不到字符的情况（None）。
 ```rust
 // Searches `haystack` for the Unicode character `needle`. If one is found, the
 // byte offset of the character is returned. Otherwise, `None` is returned.
@@ -40,7 +40,6 @@ fn find(haystack: &str, needle: char) -> Option<usize> {
     None
 }
 ```
-接下来是调用函数find的部分，假如使用match来处理返回结果的话，rust的编译器会强制要求处理所有的情况，包括None和Some两种情况，这样不容易出错，比如遗漏了找不到字符的情况（None）。
 
 接下来会列举一些Option常用的方法，这些方法是一些常见操作的定义，方便调用者使用。
 ```rust
