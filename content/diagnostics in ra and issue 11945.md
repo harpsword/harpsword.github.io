@@ -366,6 +366,8 @@ Event::Task(mut task) => {
 
 出现问题的代码属于flycheck得到的diagnostics转换成lsp_server::diagnostics的过程。在这个过程中，需要将flycheck::Diagnostic中关于问题代码的范围转换为lsp_types::Diagnostic中的Range。VS Code可以采用UTF-8或者UTF-16编码，确定编码之后，编辑器上的字符虽然显示出来只有一个，但是可能会占据多个位置；在UTF-16编码下，一个`𐐀`会占用两个位置。而flycheck得到的Range都是按照字符来进行计数的，无法直接映射到VS Code的位置。
 
+另外，RA内部的Offset计算是按照字节进行的。比如一个字符在UTF-8编码下需要两个字节来表示，那么在RA内部这个字符会占用两个位置。
+
 ## 详细例子
 
 在以下示例代码中，存在用UTF-8格式下需要多个字节来表示的字符𐐀，在这种情况下，RA给出的范围是(17, 23)，而实际上应该是(17, 27)。对应的截图![图片](https://user-images.githubusercontent.com/308347/162568089-c6e77199-bc8c-43b7-934b-fd5b19b7c16b.png)
