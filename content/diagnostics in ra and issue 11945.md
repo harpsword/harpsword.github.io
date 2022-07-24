@@ -304,6 +304,51 @@ pub fn diagnostics(
 
     res
 }
+
+// in crates/hir/src/lib.rs
+impl Module {
+    pub fn diagnostics(self, db: &dyn HirDatabase, acc: &mut Vec<AnyDiagnostic>) {
+        let _p = profile::span("Module::diagnostics").detail(|| {
+            format!("{:?}", self.name(db).map_or("<unknown>".into(), |name| name.to_string()))
+        });
+        // 计算def_map的时候会计算module中item的diagnostics数据
+        let def_map = self.id.def_map(db.upcast());
+        for diag in def_map.diagnostics() {
+            if diag.in_module != self.id.local_id {
+                // FIXME: This is accidentally quadratic.
+                continue;
+            }
+            emit_def_diagnostic(db, acc, diag);
+        }
+        // 遍历scope内的声明，计算这些声明的 diagnostics
+        // 底层可能只保存了部分ModuleDef的diagnostics
+        for decl in self.declarations(db) {
+            match decl {
+                ModuleDef::Module(m) => {
+                    // Only add diagnostics from inline modules
+                    if def_map[m.id.local_id].origin.is_inline() {
+                        m.diagnostics(db, acc)
+                    }
+                }
+                
+                _ => acc.extend(decl.diagnostics(db)),
+            }
+        }
+
+        // 遍历scope内的实现，计算这些实现的 diagnostics
+        for impl_def in self.impl_defs(db) {
+            for item in impl_def.items(db) {
+                let def: DefWithBody = match item {
+                    AssocItem::Function(it) => it.into(),
+                    AssocItem::Const(it) => it.into(),
+                    AssocItem::TypeAlias(_) => continue,
+                };
+
+                def.diagnostics(db, acc);
+            }
+        }
+    }
+}
 ```
 
 语法验证的代码(crates/syntax/src/validation.rs)
