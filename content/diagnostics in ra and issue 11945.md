@@ -10,9 +10,14 @@ tags = ["Rust", "Rust Analyzer"]
 
 # 背景
 
-在使用Rust Analyzer(下文中称RA)的过程中，经常会出现某些代码飘红的情况，表示这些代码存在问题。RA通过LSP协议中的publishDiagnositcs接口把代码诊断的结果告诉了VS Code。
+在使用Rust Analyzer(下文中称RA)的过程中，经常会出现某些代码飘红的情况，表示这些代码存在问题。RA通过LSP协议中的publishDiagnositcs接口把代码诊断的结果告诉了VS Code。如下图所示，在这个例子中，函数应该返回`String`类型，但是返回了一个`5`，类型不匹配，所以编辑器对`5`加了一条波浪线。
+
+![RA诊断例子](/image/ra_diagnostics.png)
+
 
 RA中的诊断信息有两种来源，第一种是调用rustc来分析代码得到，另一种是RA内部代码分析所得。
+
+
 
 ## 调用rustc分析代码
 RA中调用rustc分析代码的过程可以分为两部分，第一部分是调用相同的库来分析代码，并把结果通过Event的形式发送出去；第二部分在main_loop中，接收到Event之后，发现是Event::Flycheck，则对其分析结果进行转换，转换为lsp::Diagnostic格式后，发送给VS Code。
