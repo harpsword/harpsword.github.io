@@ -551,6 +551,82 @@ async fn serve_connection(
 ```
 
 
+# 错误处理的一个例子
+下面是一个handler的写法，在这个写法中，Error将会采用用户自定义的Error。
+```rust
+#[derive(Error, Debug)]
+enum MyError {
+
+}
+
+impl ResponseError for MyError {
+    fn status(&self) -> poem::http::StatusCode {
+        StatusCode::BAD_REQUEST
+    }
+}
+#[handler]
+fn hello(Path(name): Path<String>) -> Result<String, MyError> {
+    Ok(format!("hello: {}", name))
+}
+```
+核心处理部分expand之后的代码如下所示
+```rust
+			let __ret: poem::Result<Self::Output> = {
+                let (req, mut body) = req.split();
+                let p0 = <Path<String> as poem::FromRequest>::from_request(&req, &mut body).await?;
+                fn hello(Path(name): Path<String>) -> Result<String, MyError> {
+                    Ok({
+                        let res = ::alloc::fmt::format(::core::fmt::Arguments::new_v1(
+                            &["hello: "],
+                            &[::core::fmt::ArgumentV1::new_display(&name)],
+                        ));
+                        res
+                    })
+                }
+                let res = hello(p0);
+                let res = poem::error::IntoResult::into_result(res);
+                std::result::Result::map(res, poem::IntoResponse::into_response)
+            };
+```
+可以看到只需要为`Result<T, E>`实现`IntoResult`即可。
+转换过程如下所示
+	`MyError` -> `StatusCode` -> `poem::error::Error`
+调用方法`IntoResult::into_result`，会使用默认实现来转换`E`为`poem::error::Error`。恰好`E`实现了`ResponseError+StdError+Send+Sync+'static`，所以转换能够成功。设计很精巧，最初设计的时候应该会有一个详细的转换图来方便设计，没有这张图的话，阅读源码的时候很难找到对应的默认实现，
+```rust
+pub trait IntoResult<T: IntoResponse> {
+    /// Consumes this value returns a `poem::Result<T>`.
+    fn into_result(self) -> Result<T>;
+}
+
+impl<T, E> IntoResult<T> for Result<T, E>
+where
+    T: IntoResponse,
+    E: Into<Error> + Send + Sync + 'static,
+{
+    #[inline]
+    fn into_result(self) -> Result<T> {
+        self.map_err(Into::into)
+    }
+}
+
+impl<T: IntoResponse> IntoResult<T> for T {
+    #[inline]
+    fn into_result(self) -> Result<T> {
+        Ok(self)
+    }
+}
+
+impl<T: ResponseError + StdError + Send + Sync + 'static> From<T> for Error {
+    fn from(err: T) -> Self {
+        Error {
+            as_response: AsResponse::from_type::<T>(),
+            source: Some(ErrorSource::BoxedError(Box::new(err))),
+        }
+    }
+}
+```
+
+
 # 学到的经验
 1. 链式套娃 `Endpoint` trait
 	1. 把Router、RouteMethod、RouteScheme、RouteDomain都抽象为`Endpoint`
