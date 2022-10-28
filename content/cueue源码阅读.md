@@ -181,3 +181,36 @@ Release-Acquire in C++ Reference:
 
 1. 利用mmap把两块连续的内存和同一个文件绑定，即使是ring buffer也能对外提供类似数组（slice）的体验，提供批处理的能力。
 2. Release-Acquire的合理使用。Release可以认为是把写入发布出去，Acquire可以理解是尝试读取。
+
+# Another Similar Crate: rtrb
+
+
+设容量为C，存储的大小也为C。有两个指针，head和tail，取值在$[0, 2*C-1]$。存储的图如下所示，黄色的块是存储，其大小为C，pointer range的大小是2C。
+![rtrb](/image/rtrb.png)
+
+这两个指针会被映射到Memory上的位置，映射方式如下代码所示（是一种ring buffer的实现方式）。
+
+```rust
+    /// Wraps a position from the range `0 .. 2 * capacity` to `0 .. capacity`.
+    fn collapse_position(&self, pos: usize) -> usize {
+        debug_assert!(pos == 0 || pos < 2 * self.capacity);
+        if pos < self.capacity {
+            pos
+        } else {
+            pos - self.capacity
+        }
+    }
+```
+
+Writer和Reader会维护head和tail这两个指针，来实现安全的读写。
+
+|        | atomic head | atomic tail       |
+| ------ | ----------- | ---------- |
+| Writer | only load   | only write |
+| Reader | only write  | only load  |
+
+Writer和Reader内部还会维护各自的head和tail指针，其中Writer需要时不时加载atomic head，Reader需要时不时加载atomic tail。
+
+为什么只需要时不时加载？而不是一直读取atomic tail/head？
+1. 对于Writer，不断push的时候，只需要根据本地的head和tail来判断是否buffer满了。因为即使Reader在更新atomic head，也只会先出现本地head+atomic tail算出的buffer使用容量先到cap。
+2. 对于Reader逻辑类似。
