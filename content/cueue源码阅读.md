@@ -176,3 +176,8 @@ Reader中的逻辑和Writer类似，尤其是read_chunk的逻辑，只是返回�
 Release-Acquire in C++ Reference:
 >If an atomic store in thread A is tagged memory_order_release and an atomic load in thread B from the same variable is tagged memory_order_acquire, all memory writes (non-atomic and relaxed atomic) that _happened-before_ the atomic store from the point of view of thread A, become _visible side-effects_ in thread B. That is, once the atomic load is completed, thread B is guaranteed to see everything thread A wrote to memory. This promise only holds if B actually returns the value that A stored, or a value from later in the release sequence.
 
+
+# 学到的内容
+
+1. 利用mmap把两块连续的内存和同一个文件绑定，即使是ring buffer也能对外提供类似数组（slice）的体验，提供批处理的能力。
+2. Release-Acquire的合理使用。Release可以认为是把写入发布出去，Acquire可以理解是尝试读取。
