@@ -17,7 +17,7 @@ cueue包实现了一个高性能的、单生产者、单消费者、环形缓存
 
 # 存储设计
 cueue中的存储如下图所示。一共存在两种不同的存储memory和file，对于control block，两边是单独采用mmap进行映射；对于buf，将两块连续的memory都映射到文件的同一块区域，目的是为了环型缓存下依旧可以获取一个连续的内存空间。
-![](/image/cueue_memory1.png)
+![](/image/cueue_memory.png)
 其中memory的两块绿色的buf和file中黄色的区域大小是相同的。
 
 
@@ -170,7 +170,7 @@ Reader中的逻辑和Writer类似，尤其是read_chunk的逻辑，只是返回�
 
 ## 内存顺序
 考虑多线程情况下的Reader和Writer访问原子变量的情况。如下图所示
-![](/image/cueue_sync.png)
+![](/image/cueue_memory1.png)
 可以看到Writer采用release的order来存储`write pos`，当Reader按照acquire ordering读取`write pos`，假如读到了`write pos`的本次变化，那么之后在内存中也能读到对应的数据。同理，当Writer按照acquire ordering读取`read pos`，假如读到了`read pos`，也能确认内存中的这块数据被读取了（或者说适用方手动调用了commit）。
 
 Release-Acquire in C++ Reference:
