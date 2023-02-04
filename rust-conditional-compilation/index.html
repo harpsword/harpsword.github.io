@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+      <!-- Enable responsiveness on mobile devices-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+      <title>yu&#x27;s blog - Rust Conditional Compilation</title>
+
+      
+
+      
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/slideout/1.0.1/slideout.min.js"></script>
+          
+      
+
+      
+          <link rel="stylesheet" href="https://harpsword.github.io/site.css">
+          
+      
+
+      
+      
+    </head>
+
+    <body>
+        <div class="container">
+
+            <div id="mobile-navbar" class="mobile-navbar">
+              <div class="mobile-header-logo">
+                <a href="/" class="logo">Yu 的天地</a>
+              </div>
+              <div class="mobile-navbar-icon icon-out">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+
+            <nav id="mobile-menu" class="mobile-menu slideout-menu slideout-menu-left">
+              <ul class="mobile-menu-list">
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                            Home
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                            Categories
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                            Tags
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                            About
+                        </a>
+                    </li>
+                
+              </ul>
+            </nav>
+
+            <header id="header">
+                <div class="logo"><a href="https:&#x2F;&#x2F;harpsword.github.io">Yu 的天地</a></div>
+                <nav class="menu">
+                    <ul>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                                    Home
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                                    Categories
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                                    Tags
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                                    About
+                                </a>
+                            </li>
+                        
+                    </ul>
+                </nav>
+            </header>
+
+            <main>
+                <div class="content" id="mobile-panel">
+                    
+
+
+<div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content always-active">
+        <nav id="TableOfContents">
+            <ul>
+                
+                <li>
+                    <a href="https://harpsword.github.io/rust-conditional-compilation/#conditional-compilation" class="toc-link">Conditional Compilation</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/rust-conditional-compilation/#configurationpredicate" class="toc-link">ConfigurationPredicate</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/rust-conditional-compilation/#cfg" class="toc-link">cfg</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/rust-conditional-compilation/#cfg-attr" class="toc-link">cfg_attr</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/rust-conditional-compilation/#cfg-hong" class="toc-link">cfg 宏</a>
+                    
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+<article class="post">
+    
+    <header class="post__header">
+        <h1 class="post__title">
+            <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;rust-conditional-compilation&#x2F;">Rust Conditional Compilation</a>
+        </h1>
+        <div class="post__meta">
+            <span class="post__time">2022-07-23</span>
+            
+        </div>
+    </header>
+
+    <div class="post-content">
+      <h1 id="conditional-compilation">Conditional Compilation</h1>
+<p>条件编译，原文来自<a href="https://doc.rust-lang.org/reference/conditional-compilation.html">reference link</a>，本文是原文的翻译总结。</p>
+<p>主要包含的内容：</p>
+<ol>
+<li>ConfigurationPredicate: 配置断言
+<ol>
+<li>ConfigurationOption</li>
+<li>ConfigurationAll</li>
+<li>ConfigurationAny</li>
+<li>ConfigurationNot</li>
+</ol>
+</li>
+<li><code>cfg</code>,</li>
+<li><code>cfg_attr</code></li>
+<li><code>cfg!</code>宏</li>
+</ol>
+<h1 id="configurationpredicate">ConfigurationPredicate</h1>
+<p>有四种类别</p>
+<table><thead><tr><th>name</th><th>特点</th></tr></thead><tbody>
+<tr><td>ConfigurationOption</td><td>Identifier 是否等于 具体的取值(feature=&quot;std&quot;), 或者Name是否被设置(unix)</td></tr>
+<tr><td>ConfigurationAll</td><td>有一个条件为false，则为false。无条件时取值为true</td></tr>
+<tr><td>ConfigurationAny</td><td>有一个题哦啊见为true则为true。无条件时取值为false</td></tr>
+<tr><td>ConfigurationNot</td><td>取反</td></tr>
+</tbody></table>
+<p>需要详细说一下 ConfigurationOption。对于Name is set or unset，设置的name是在编译过程中确定的。
+对于key-value类型，有一些可用的例子：</p>
+<ol>
+<li>target_arch: CPU架构
+<ol>
+<li>&quot;x86&quot;</li>
+<li>&quot;x86_64&quot;</li>
+<li>&quot;mips&quot;</li>
+<li>&quot;arm&quot;</li>
+<li>&quot;aarch64&quot;</li>
+</ol>
+</li>
+<li>target_feature: 针对的feature，不是固定的取值</li>
+<li>target_os: 目标操作系统
+<ol>
+<li>&quot;windows&quot;</li>
+<li>&quot;macos&quot;</li>
+<li>&quot;ios&quot;</li>
+<li>&quot;linux&quot;</li>
+</ol>
+</li>
+<li>target_family: 目标操作系统族
+<ol>
+<li>&quot;unix&quot;</li>
+<li>&quot;windows&quot;</li>
+<li>&quot;wasm&quot;</li>
+</ol>
+</li>
+<li>unix is set if target_family = &quot;unix&quot; is set, windows is the same.可以认为unix和windows是target_family=的简称。</li>
+<li>target_env: 具体的工作环境？（软件）
+<ol>
+<li>&quot;gnu&quot;</li>
+<li>&quot;msvc&quot;</li>
+<li>&quot;musl&quot;</li>
+</ol>
+</li>
+<li>target_endian: 大小序
+<ol>
+<li>little</li>
+<li>big</li>
+</ol>
+</li>
+<li>target_pointer_width: 指针宽度</li>
+<li>target_vendor: 
+<ol>
+<li>apple</li>
+<li>fortanix</li>
+<li>pc</li>
+<li>unknown</li>
+</ol>
+</li>
+<li>test: 表示是测试代码</li>
+</ol>
+<h1 id="cfg">cfg</h1>
+<p>对应语法</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>CfgAttrAttribute:
+</span><span>	cfg (ConfigurationPredicate)
+</span></code></pre>
+<p>cfg是一种attribute，可以用在所有attribute能用的地方。用cfg attri来描述一些代码，当断言为true时，对应的代码会被包含到源代码中（删除cfg attri的内容）；为false，对应代码则会被删除。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>#![</span><span style="color:#bf616a;">allow</span><span>(unused)]
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">main</span><span>() {
+</span><span style="color:#65737e;">// The function is only included in the build when compiling for macOS
+</span><span>#[</span><span style="color:#bf616a;">cfg</span><span>(target_os = &quot;</span><span style="color:#a3be8c;">macos</span><span>&quot;)]
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">macos_only</span><span>() {
+</span><span>  </span><span style="color:#65737e;">// ...
+</span><span>}
+</span><span>
+</span><span style="color:#65737e;">// This function is only included when either foo or bar is defined
+</span><span>#[</span><span style="color:#bf616a;">cfg</span><span>(</span><span style="color:#bf616a;">any</span><span>(foo, bar))]
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">needs_foo_or_bar</span><span>() {
+</span><span>  </span><span style="color:#65737e;">// ...
+</span><span>}
+</span><span>
+</span><span style="color:#65737e;">// This function is only included when compiling for a unixish OS with a 32-bit
+</span><span style="color:#65737e;">// architecture
+</span><span>#[</span><span style="color:#bf616a;">cfg</span><span>(</span><span style="color:#bf616a;">all</span><span>(unix, target_pointer_width = &quot;</span><span style="color:#a3be8c;">32</span><span>&quot;))]
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">on_32bit_unix</span><span>() {
+</span><span>  </span><span style="color:#65737e;">// ...
+</span><span>}
+</span><span>
+</span><span style="color:#65737e;">// This function is only included when foo is not defined
+</span><span>#[</span><span style="color:#bf616a;">cfg</span><span>(</span><span style="color:#bf616a;">not</span><span>(foo))]
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">needs_not_foo</span><span>() {
+</span><span>  </span><span style="color:#65737e;">// ...
+</span><span>}
+</span><span>
+</span><span style="color:#65737e;">// This function is only included when the panic strategy is set to unwind
+</span><span>#[</span><span style="color:#bf616a;">cfg</span><span>(panic = &quot;</span><span style="color:#a3be8c;">unwind</span><span>&quot;)]
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">when_unwinding</span><span>() {
+</span><span>  </span><span style="color:#65737e;">// ...
+</span><span>}
+</span><span>
+</span><span>}
+</span></code></pre>
+<h1 id="cfg-attr">cfg_attr</h1>
+<p>syntax:</p>
+<p><em>CfgAttrAttribute</em> :<br />
+   <code>cfg_attr</code> <code>(</code> <em>ConfigurationPredicate</em> <code>,</code> <em>CfgAttrs</em>? <code>)</code></p>
+<p><em>CfgAttrs</em> :<br />
+   <a href="https://doc.rust-lang.org/reference/attributes.html"><em>Attr</em></a> (<code>,</code> <a href="https://doc.rust-lang.org/reference/attributes.html"><em>Attr</em></a>)* <code>,</code>?</p>
+<p>当断言为true时，后面的CfgAttrs就会被应用到对应的代码上。</p>
+<p>Examples</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#65737e;">// linux 系统 mod os 定义在 linux.rs
+</span><span style="color:#65737e;">// windows 系统, mod os 定义在 windows.rs
+</span><span>#[</span><span style="color:#bf616a;">cfg_attr</span><span>(target_os = &quot;</span><span style="color:#a3be8c;">linux</span><span>&quot;, path = &quot;</span><span style="color:#a3be8c;">linux.rs</span><span>&quot;)] 
+</span><span>#[</span><span style="color:#bf616a;">cfg_attr</span><span>(windows, path = &quot;</span><span style="color:#a3be8c;">windows.rs</span><span>&quot;)] 
+</span><span style="color:#b48ead;">mod </span><span>os;
+</span></code></pre>
+<h1 id="cfg-hong">cfg 宏</h1>
+<p><code>cfg!</code>可以用作宏，评估包含的断言(ConfigurationPredicate)，返回最终的结果true or false.Examples</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">let</span><span> machine_kind = </span><span style="color:#b48ead;">if </span><span>cfg!(unix) {
+</span><span>  &quot;</span><span style="color:#a3be8c;">unix</span><span>&quot;
+</span><span>} </span><span style="color:#b48ead;">else if </span><span>cfg!(windows) {
+</span><span>  &quot;</span><span style="color:#a3be8c;">windows</span><span>&quot;
+</span><span>} </span><span style="color:#b48ead;">else </span><span>{
+</span><span>  &quot;</span><span style="color:#a3be8c;">unknown</span><span>&quot;
+</span><span>};
+</span><span>
+</span><span>println!(&quot;</span><span style="color:#a3be8c;">I&#39;m running on a </span><span style="color:#d08770;">{}</span><span style="color:#a3be8c;"> machine!</span><span>&quot;, machine_kind);
+</span></code></pre>
+
+    </div>
+
+    
+    
+
+    <div class="post-footer">
+        
+            
+                <div class="post-tags">
+                    
+                        <a href="https://harpsword.github.io/tags/rust/">#Rust</a>
+                    
+                </div>
+            
+            
+
+        
+
+    </div>
+
+    
+    
+</article>
+
+
+                </div>
+            </main>
+
+            
+            
+        </div>
+
+      
+          <script type="text/javascript" src="https://harpsword.github.io/even.js" ></script>
+      
+    </body>
+
+</html>

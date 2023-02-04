@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+      <!-- Enable responsiveness on mobile devices-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+      <title>yu&#x27;s blog - Error Handling in Rust</title>
+
+      
+
+      
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/slideout/1.0.1/slideout.min.js"></script>
+          
+      
+
+      
+          <link rel="stylesheet" href="https://harpsword.github.io/site.css">
+          
+      
+
+      
+      
+    </head>
+
+    <body>
+        <div class="container">
+
+            <div id="mobile-navbar" class="mobile-navbar">
+              <div class="mobile-header-logo">
+                <a href="/" class="logo">Yu 的天地</a>
+              </div>
+              <div class="mobile-navbar-icon icon-out">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+
+            <nav id="mobile-menu" class="mobile-menu slideout-menu slideout-menu-left">
+              <ul class="mobile-menu-list">
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                            Home
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                            Categories
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                            Tags
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                            About
+                        </a>
+                    </li>
+                
+              </ul>
+            </nav>
+
+            <header id="header">
+                <div class="logo"><a href="https:&#x2F;&#x2F;harpsword.github.io">Yu 的天地</a></div>
+                <nav class="menu">
+                    <ul>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                                    Home
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                                    Categories
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                                    Tags
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                                    About
+                                </a>
+                            </li>
+                        
+                    </ul>
+                </nav>
+            </header>
+
+            <main>
+                <div class="content" id="mobile-panel">
+                    
+
+
+<div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content always-active">
+        <nav id="TableOfContents">
+            <ul>
+                
+                <li>
+                    <a href="https://harpsword.github.io/error-handling-in-rust/#option" class="toc-link">Option</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/error-handling-in-rust/#result" class="toc-link">Result</a>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/error-handling-in-rust/#zi-ding-yi-error" class="toc-link">自定义Error</a>
+                        </li>
+                        
+                    </ul>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/error-handling-in-rust/#trait" class="toc-link">trait</a>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/error-handling-in-rust/#error-trait" class="toc-link">Error trait</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/error-handling-in-rust/#from-trait" class="toc-link">From trait</a>
+                        </li>
+                        
+                    </ul>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/error-handling-in-rust/#yi-ge-wan-zheng-de-li-zi" class="toc-link">一个完整的例子</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/error-handling-in-rust/#yi-xie-jing-yan" class="toc-link">一些经验</a>
+                    
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+<article class="post">
+    
+    <header class="post__header">
+        <h1 class="post__title">
+            <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;error-handling-in-rust&#x2F;">Error Handling in Rust</a>
+        </h1>
+        <div class="post__meta">
+            <span class="post__time">2021-08-15</span>
+            
+        </div>
+    </header>
+
+    <div class="post-content">
+      <p>Error Handling 主要有两种思路，一种是Try-Catch，另一种是通过Return Value，而Rust主要采用后一种。</p>
+<p>主要的数据结构有Option、Result，具体的定义如下所示，Option主要用于处理存在None的情况，Result主要用于处理返回错误的情况。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">enum </span><span>Option&lt;T&gt; {
+</span><span>    None,
+</span><span>    Some(T),
+</span><span>}
+</span><span style="color:#b48ead;">enum </span><span>Result&lt;T, E&gt; {
+</span><span>    Ok(T),
+</span><span>    Err(E),
+</span><span>}
+</span></code></pre>
+<h2 id="option">Option</h2>
+<p>Option的定位是处理存在Null的情况，在下述例子中，在字符串中查找某个字符，这个字符可能会不存在，这时候就会返回None。
+接下来是调用函数find的部分，假如使用match来处理返回结果的话，rust的编译器会强制要求处理所有的情况，包括None和Some两种情况，这样不容易出错，比如遗漏了找不到字符的情况（None）。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#65737e;">// Searches `haystack` for the Unicode character `needle`. If one is found, the
+</span><span style="color:#65737e;">// byte offset of the character is returned. Otherwise, `None` is returned.
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">find</span><span>(</span><span style="color:#bf616a;">haystack</span><span>: &amp;</span><span style="color:#b48ead;">str</span><span>, </span><span style="color:#bf616a;">needle</span><span>: </span><span style="color:#b48ead;">char</span><span>) -&gt; Option&lt;</span><span style="color:#b48ead;">usize</span><span>&gt; {
+</span><span>    </span><span style="color:#b48ead;">for </span><span>(offset, c) in haystack.</span><span style="color:#96b5b4;">char_indices</span><span>() {
+</span><span>        </span><span style="color:#b48ead;">if</span><span> c == needle {
+</span><span>            </span><span style="color:#b48ead;">return </span><span>Some(offset);
+</span><span>        }
+</span><span>    }
+</span><span>    None
+</span><span>}
+</span></code></pre>
+<p>接下来会列举一些Option常用的方法，这些方法是一些常见操作的定义，方便调用者使用。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>
+</span><span style="color:#b48ead;">impl</span><span>&lt;T&gt; for Option&lt;T&gt; {
+</span><span>  </span><span style="color:#65737e;">// map
+</span><span>  </span><span style="color:#65737e;">// 当取值为some时，应用对应的函数
+</span><span>  </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">map</span><span>&lt;U, F: FnOnce(T) -&gt; U&gt;(</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">f</span><span>: F) -&gt; Option&lt;U&gt; {
+</span><span>      </span><span style="color:#b48ead;">match </span><span style="color:#bf616a;">self </span><span>{
+</span><span>          Some(x) =&gt; Some(</span><span style="color:#96b5b4;">f</span><span>(x)),
+</span><span>          None =&gt; None,
+</span><span>      }
+</span><span>  }
+</span><span>
+</span><span>  </span><span style="color:#65737e;">// unwrap_or 
+</span><span>  </span><span style="color:#65737e;">// 返回Some中的值或者返回默认值default
+</span><span>  </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">unwrap_or</span><span>(</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">default</span><span>: T) -&gt; T {
+</span><span>      </span><span style="color:#b48ead;">match </span><span style="color:#bf616a;">self </span><span>{
+</span><span>          Some(x) =&gt; x,
+</span><span>          None =&gt; default,
+</span><span>      }
+</span><span>  }
+</span><span>
+</span><span>  </span><span style="color:#65737e;">// unwarp_or_else 返回Some中的值，或者返回函数F返回的值
+</span><span>  </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">unwrap_or_else</span><span>&lt;F: FnOnce() -&gt; T&gt;(</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">f</span><span>: F) -&gt; T {
+</span><span>      </span><span style="color:#b48ead;">match </span><span style="color:#bf616a;">self </span><span>{
+</span><span>          Some(x) =&gt; x,
+</span><span>          None =&gt; </span><span style="color:#96b5b4;">f</span><span>(),
+</span><span>      }
+</span><span>  }
+</span><span>
+</span><span>  </span><span style="color:#65737e;">// and_then 函数
+</span><span>  </span><span style="color:#65737e;">// if option is `None`, return None
+</span><span>  </span><span style="color:#65737e;">// else 执行函数f于包含的值x，并返回结果
+</span><span>  </span><span style="color:#65737e;">// 和 map不同之处在于调用的函数签名不同
+</span><span>  </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">and_then</span><span>&lt;U, F: FnOnce(T) -&gt; Option&lt;U&gt;&gt;(</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">f</span><span>: F) -&gt; Option&lt;U&gt; {
+</span><span>      </span><span style="color:#b48ead;">match </span><span style="color:#bf616a;">self </span><span>{
+</span><span>          Some(x) =&gt; </span><span style="color:#96b5b4;">f</span><span>(x),
+</span><span>          None =&gt; None,
+</span><span>      }
+</span><span>  }
+</span><span>
+</span><span>  </span><span style="color:#65737e;">// take 函数
+</span><span>  </span><span style="color:#65737e;">/// Takes the value out of the option, leaving a [`None`] in its place.
+</span><span>  </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">take</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>) -&gt; Option&lt;T&gt; ;
+</span><span>
+</span><span>  </span><span style="color:#65737e;">// as系列函数
+</span><span>  </span><span style="color:#65737e;">/// Converts from `&amp;Option&lt;T&gt;` to `Option&lt;&amp;T&gt;`.
+</span><span>  </span><span style="color:#b48ead;">pub const fn </span><span style="color:#8fa1b3;">as_ref</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>) -&gt; Option&lt;&amp;T&gt;;
+</span><span>
+</span><span>  </span><span style="color:#65737e;">/// Converts from `&amp;mut Option&lt;T&gt;` to `Option&lt;&amp;mut T&gt;`.
+</span><span>  </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">as_mut</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>) -&gt; Option&lt;&amp;</span><span style="color:#b48ead;">mut</span><span> T&gt;;
+</span><span>
+</span><span>  </span><span style="color:#65737e;">/// Converts from `Option&lt;T&gt;` (or `&amp;Option&lt;T&gt;`) to `Option&lt;&amp;T::Target&gt;`.
+</span><span>  </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">as_deref</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>) -&gt; Option&lt;&amp;</span><span style="color:#b48ead;">T::</span><span>Target&gt; {
+</span><span>      </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">as_ref</span><span>().</span><span style="color:#96b5b4;">map</span><span>(|</span><span style="color:#bf616a;">t</span><span>| t.</span><span style="color:#96b5b4;">deref</span><span>())
+</span><span>  }
+</span><span>
+</span><span>  </span><span style="color:#65737e;">/// Converts from `Option&lt;T&gt;` (or `&amp;mut Option&lt;T&gt;`) to `Option&lt;&amp;mut T::Target&gt;`.
+</span><span>  </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">as_deref_mut</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>) -&gt; Option&lt;&amp;</span><span style="color:#b48ead;">mut T::</span><span>Target&gt; {
+</span><span>      </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">as_mut</span><span>().</span><span style="color:#96b5b4;">map</span><span>(|</span><span style="color:#bf616a;">t</span><span>| t.</span><span style="color:#96b5b4;">deref_mut</span><span>())
+</span><span>  }
+</span><span>}
+</span><span>
+</span></code></pre>
+<h2 id="result">Result</h2>
+<p>Result和Option一样都定义在标准库中，可以认为Option是Result的一个特例，具体的定义如下所示。Result可以用来表示可能返回错误的返回结果。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">enum </span><span>Result&lt;T, E&gt; {
+</span><span>    Ok(T),
+</span><span>    Err(E),
+</span><span>}
+</span><span style="color:#b48ead;">type </span><span>Option&lt;T&gt; = Result&lt;T, ()&gt;;
+</span></code></pre>
+<p>简单罗列一下Result的一些方法，这些方法定义中的T和E是Result的泛型参数，具体如上述Result的定义。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">impl</span><span>&lt;T, E: ::std::fmt::Debug&gt; Result&lt;T, E&gt; {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">unwrap</span><span>(</span><span style="color:#bf616a;">self</span><span>) -&gt; T {
+</span><span>        </span><span style="color:#b48ead;">match </span><span style="color:#bf616a;">self </span><span>{
+</span><span>            Result::Ok(val) =&gt; val,
+</span><span>            Result::Err(err) =&gt;
+</span><span>              panic!(&quot;</span><span style="color:#a3be8c;">called `Result::unwrap()` on an `Err` value: {:?}</span><span>&quot;, err),
+</span><span>        }
+</span><span>    }
+</span><span>}
+</span><span>
+</span></code></pre>
+<p>?的使用如下所示</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#65737e;">// ? 当Result结果是Err时会返回err　
+</span><span style="color:#b48ead;">let</span><span> content = std::fs::read_to_string(&quot;</span><span style="color:#a3be8c;">test.txt</span><span>&quot;)?;
+</span><span>
+</span><span style="color:#65737e;">// 等价于 标黄的部分
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">main</span><span>() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+</span><span>    </span><span style="color:#b48ead;">let</span><span> result = std::fs::read_to_string(&quot;</span><span style="color:#a3be8c;">test.txt</span><span>&quot;);
+</span><span>    </span><span style="color:#b48ead;">let</span><span> content = </span><span style="color:#b48ead;">match</span><span> result {
+</span><span>        Ok(content) =&gt; { content },
+</span><span>        Err(error) =&gt; { </span><span style="color:#b48ead;">return </span><span>Err(error.</span><span style="color:#96b5b4;">into</span><span>()); }
+</span><span>    };
+</span><span>    println!(&quot;</span><span style="color:#a3be8c;">file content: </span><span style="color:#d08770;">{}</span><span>&quot;, content);
+</span><span>    Ok(())
+</span><span>}
+</span></code></pre>
+<h3 id="zi-ding-yi-error">自定义Error</h3>
+<p>可以根据可能遇到的错误来定义自己的错误，一般采用enum类型，里面是不同的错误类型。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">use </span><span>std::io;
+</span><span style="color:#b48ead;">use </span><span>std::num;
+</span><span>
+</span><span style="color:#65737e;">// We derive `Debug` because all types should probably derive `Debug`.
+</span><span style="color:#65737e;">// This gives us a reasonable human readable description of `CliError` values.
+</span><span>#[</span><span style="color:#bf616a;">derive</span><span>(Debug)]
+</span><span style="color:#b48ead;">enum </span><span>CliError {
+</span><span>    Io(io::Error),
+</span><span>    Parse(num::ParseIntError),
+</span><span>}
+</span></code></pre>
+<h2 id="trait">trait</h2>
+<p>错误处理中常用的两个trait：</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">use </span><span>std::fmt::{Debug, Display};
+</span><span>
+</span><span style="color:#b48ead;">trait </span><span>Error: Debug + Display {
+</span><span>  </span><span style="color:#65737e;">/// A short description of the error.
+</span><span>  </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">description</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>) -&gt; &amp;</span><span style="color:#b48ead;">str</span><span>;
+</span><span>
+</span><span>  </span><span style="color:#65737e;">/// The lower level cause of this error, if any.
+</span><span>  </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">cause</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>) -&gt; Option&lt;&amp;Error&gt; { None }
+</span><span>}
+</span></code></pre>
+<h3 id="error-trait">Error trait</h3>
+<p>拿前面实现的CliError来展示一下如何实现，需要先实现Display方法，</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">use </span><span>std::error;
+</span><span style="color:#b48ead;">use </span><span>std::fmt;
+</span><span>
+</span><span style="color:#b48ead;">impl </span><span>fmt::Display </span><span style="color:#b48ead;">for </span><span>CliError {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">fmt</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">f</span><span>: &amp;</span><span style="color:#b48ead;">mut </span><span>fmt::Formatter) -&gt; fmt::Result {
+</span><span>        </span><span style="color:#b48ead;">match </span><span>*</span><span style="color:#bf616a;">self </span><span>{
+</span><span>            </span><span style="color:#65737e;">// Both underlying errors already impl `Display`, so we defer to
+</span><span>            </span><span style="color:#65737e;">// their implementations.
+</span><span>            CliError::Io(</span><span style="color:#b48ead;">ref</span><span> err) =&gt; write!(f, &quot;</span><span style="color:#a3be8c;">IO error: </span><span style="color:#d08770;">{}</span><span>&quot;, err),
+</span><span>            CliError::Parse(</span><span style="color:#b48ead;">ref</span><span> err) =&gt; write!(f, &quot;</span><span style="color:#a3be8c;">Parse error: </span><span style="color:#d08770;">{}</span><span>&quot;, err),
+</span><span>        }
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl </span><span>error::Error </span><span style="color:#b48ead;">for </span><span>CliError {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">description</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>) -&gt; &amp;</span><span style="color:#b48ead;">str </span><span>{
+</span><span>        </span><span style="color:#65737e;">// Both underlying errors already impl `Error`, so we defer to their
+</span><span>        </span><span style="color:#65737e;">// implementations.
+</span><span>        </span><span style="color:#b48ead;">match </span><span>*</span><span style="color:#bf616a;">self </span><span>{
+</span><span>            CliError::Io(</span><span style="color:#b48ead;">ref</span><span> err) =&gt; err.</span><span style="color:#96b5b4;">description</span><span>(),
+</span><span>            </span><span style="color:#65737e;">// Normally we can just write `err.description()`, but the error
+</span><span>            </span><span style="color:#65737e;">// type has a concrete method called `description`, which conflicts
+</span><span>            </span><span style="color:#65737e;">// with the trait method. For now, we must explicitly call
+</span><span>            </span><span style="color:#65737e;">// `description` through the `Error` trait.
+</span><span>            CliError::Parse(</span><span style="color:#b48ead;">ref</span><span> err) =&gt; error::Error::description(err),
+</span><span>        }
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">cause</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>) -&gt; Option&lt;&amp;error::Error&gt; {
+</span><span>        </span><span style="color:#b48ead;">match </span><span>*</span><span style="color:#bf616a;">self </span><span>{
+</span><span>            </span><span style="color:#65737e;">// N.B. Both of these implicitly cast `err` from their concrete
+</span><span>            </span><span style="color:#65737e;">// types (either `&amp;io::Error` or `&amp;num::ParseIntError`)
+</span><span>            </span><span style="color:#65737e;">// to a trait object `&amp;Error`. This works because both error types
+</span><span>            </span><span style="color:#65737e;">// implement `Error`.
+</span><span>            CliError::Io(</span><span style="color:#b48ead;">ref</span><span> err) =&gt; Some(err),
+</span><span>            CliError::Parse(</span><span style="color:#b48ead;">ref</span><span> err) =&gt; Some(err),
+</span><span>        }
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h3 id="from-trait">From trait</h3>
+<p>定义如下，举了一个例子，Error实现了from方法，那么可以通过调用Error::from()来把传入的参数转换为Error类型。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">trait </span><span>From&lt;T&gt; {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">from</span><span>(T) -&gt; </span><span style="color:#b48ead;">Self</span><span>;
+</span><span>}
+</span><span style="color:#b48ead;">impl</span><span>&lt;T&gt; From&lt;T&gt; </span><span style="color:#b48ead;">for </span><span>Error {
+</span><span>	</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">from</span><span>(T) -&gt; </span><span style="color:#b48ead;">Self</span><span>;
+</span><span>}
+</span></code></pre>
+<p>那么From trait和Error handling如何搭上关系的呢？下面先看一个宏？的定义，在遇到错误的时候，会调用convert::From方法来对错误进行转换，编译器会根据返回的Error和当前Error来推断使用的From实现。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#96b5b4;">macro_rules! </span><span>r#try {
+</span><span>    (</span><span style="color:#bf616a;">$expr</span><span>:expr $(,)?) =&gt; {
+</span><span>        </span><span style="color:#b48ead;">match </span><span style="color:#bf616a;">$expr </span><span>{
+</span><span>            </span><span style="color:#bf616a;">$crate</span><span>::result::Result::Ok(val) =&gt; val,
+</span><span>            </span><span style="color:#bf616a;">$crate</span><span>::result::Result::Err(err) =&gt; {
+</span><span>                </span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">$crate</span><span>::result::Result::Err(</span><span style="color:#bf616a;">$crate</span><span>::convert::From::from(err));
+</span><span>            }
+</span><span>        }
+</span><span>    };
+</span><span>}
+</span></code></pre>
+<h2 id="yi-ge-wan-zheng-de-li-zi">一个完整的例子</h2>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">use </span><span>std::fs::File;
+</span><span style="color:#b48ead;">use </span><span>std::io::{</span><span style="color:#bf616a;">self</span><span>, Read};
+</span><span style="color:#b48ead;">use </span><span>std::num;
+</span><span style="color:#b48ead;">use </span><span>std::path::Path;
+</span><span>
+</span><span style="color:#65737e;">// We derive `Debug` because all types should probably derive `Debug`.
+</span><span style="color:#65737e;">// This gives us a reasonable human readable description of `CliError` values.
+</span><span>#[</span><span style="color:#bf616a;">derive</span><span>(Debug)]
+</span><span style="color:#b48ead;">enum </span><span>CliError {
+</span><span>    Io(io::Error),
+</span><span>    Parse(num::ParseIntError),
+</span><span>}
+</span><span>
+</span><span style="color:#65737e;">// From trait的实现
+</span><span style="color:#b48ead;">impl </span><span>From&lt;io::Error&gt; </span><span style="color:#b48ead;">for </span><span>CliError {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">from</span><span>(</span><span style="color:#bf616a;">err</span><span>: io::Error) -&gt; CliError {
+</span><span>        CliError::Io(err)
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl </span><span>From&lt;num::ParseIntError&gt; </span><span style="color:#b48ead;">for </span><span>CliError {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">from</span><span>(</span><span style="color:#bf616a;">err</span><span>: num::ParseIntError) -&gt; CliError {
+</span><span>        CliError::Parse(err)
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#65737e;">// 读取文件后转换为i32， 再乘以2
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">file_double</span><span>&lt;P: AsRef&lt;Path&gt;&gt;(</span><span style="color:#bf616a;">file_path</span><span>: P) -&gt; Result&lt;</span><span style="color:#b48ead;">i32</span><span>, CliError&gt; {
+</span><span>    </span><span style="color:#b48ead;">let mut</span><span> file = File::open(file_path)?;
+</span><span>    </span><span style="color:#b48ead;">let mut</span><span> contents = String::new();
+</span><span>    file.</span><span style="color:#96b5b4;">read_to_string</span><span>(&amp;</span><span style="color:#b48ead;">mut</span><span> contents)?;
+</span><span>    </span><span style="color:#b48ead;">let</span><span> n: </span><span style="color:#b48ead;">i32 </span><span>= contents.</span><span style="color:#96b5b4;">trim</span><span>().</span><span style="color:#96b5b4;">parse</span><span>()?;
+</span><span>    Ok(</span><span style="color:#d08770;">2 </span><span>* n)
+</span><span>}
+</span></code></pre>
+<h2 id="yi-xie-jing-yan">一些经验</h2>
+<ol>
+<li>当实现的代码只是一个简单的例子，使用unwrap很合适，实现完整的错误处理需要过多的时间。</li>
+<li>完成一个项目的时候，觉得还是要做一下错误处理，可以使用Box<Error> (or Box&lt;Error + Send + Sync&gt;) ，或者使用anyhow包中的anyhow::Error。</li>
+<li>当有一定精力的时候，可以实现一下自己的错误，甚至实现对应的From trait。</li>
+<li>熟练掌握Option和Result的一些方法可以提高自己的生产力。</li>
+</ol>
+
+    </div>
+
+    
+    
+
+    <div class="post-footer">
+        
+            
+                <div class="post-tags">
+                    
+                        <a href="https://harpsword.github.io/tags/rust/">#Rust</a>
+                    
+                        <a href="https://harpsword.github.io/tags/error-handling/">#Error Handling</a>
+                    
+                </div>
+            
+            
+
+        
+
+    </div>
+
+    
+    
+</article>
+
+
+                </div>
+            </main>
+
+            
+            
+        </div>
+
+      
+          <script type="text/javascript" src="https://harpsword.github.io/even.js" ></script>
+      
+    </body>
+
+</html>

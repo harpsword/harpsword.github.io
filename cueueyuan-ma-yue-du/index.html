@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+      <!-- Enable responsiveness on mobile devices-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+      <title>yu&#x27;s blog - cueue包阅读-一种高性能、单生产者单消费者、环形缓存channel</title>
+
+      
+
+      
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/slideout/1.0.1/slideout.min.js"></script>
+          
+      
+
+      
+          <link rel="stylesheet" href="https://harpsword.github.io/site.css">
+          
+      
+
+      
+      
+    </head>
+
+    <body>
+        <div class="container">
+
+            <div id="mobile-navbar" class="mobile-navbar">
+              <div class="mobile-header-logo">
+                <a href="/" class="logo">Yu 的天地</a>
+              </div>
+              <div class="mobile-navbar-icon icon-out">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+
+            <nav id="mobile-menu" class="mobile-menu slideout-menu slideout-menu-left">
+              <ul class="mobile-menu-list">
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                            Home
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                            Categories
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                            Tags
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                            About
+                        </a>
+                    </li>
+                
+              </ul>
+            </nav>
+
+            <header id="header">
+                <div class="logo"><a href="https:&#x2F;&#x2F;harpsword.github.io">Yu 的天地</a></div>
+                <nav class="menu">
+                    <ul>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                                    Home
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                                    Categories
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                                    Tags
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                                    About
+                                </a>
+                            </li>
+                        
+                    </ul>
+                </nav>
+            </header>
+
+            <main>
+                <div class="content" id="mobile-panel">
+                    
+
+
+<div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content always-active">
+        <nav id="TableOfContents">
+            <ul>
+                
+                <li>
+                    <a href="https://harpsword.github.io/cueueyuan-ma-yue-du/#bao-jie-shao" class="toc-link">包介绍</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/cueueyuan-ma-yue-du/#cun-chu-she-ji" class="toc-link">存储设计</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/cueueyuan-ma-yue-du/#du-xie-she-ji" class="toc-link">读写设计</a>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/cueueyuan-ma-yue-du/#writer" class="toc-link">Writer</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/cueueyuan-ma-yue-du/#reader" class="toc-link">Reader</a>
+                        </li>
+                        
+                    </ul>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/cueueyuan-ma-yue-du/#yi-xie-xi-jie" class="toc-link">一些细节</a>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/cueueyuan-ma-yue-du/#xi-tong-diao-yong" class="toc-link">系统调用</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/cueueyuan-ma-yue-du/#nei-cun-shun-xu" class="toc-link">内存顺序</a>
+                        </li>
+                        
+                    </ul>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/cueueyuan-ma-yue-du/#xue-dao-de-nei-rong" class="toc-link">学到的内容</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/cueueyuan-ma-yue-du/#another-similar-crate-rtrb" class="toc-link">Another Similar Crate: rtrb</a>
+                    
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+<article class="post">
+    
+    <header class="post__header">
+        <h1 class="post__title">
+            <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;cueueyuan-ma-yue-du&#x2F;">cueue包阅读-一种高性能、单生产者单消费者、环形缓存channel</a>
+        </h1>
+        <div class="post__meta">
+            <span class="post__time">2022-10-26</span>
+            
+        </div>
+    </header>
+
+    <div class="post-content">
+      <h1 id="bao-jie-shao">包介绍</h1>
+<p>cueue包实现了一个高性能的、单生产者、单消费者、环形缓存的通道，支持无锁的原子（批）读写，适合跨线程的数据流动。</p>
+<p><a href="https://github.com/erenon/cueue">github link</a></p>
+<h1 id="cun-chu-she-ji">存储设计</h1>
+<p>cueue中的存储如下图所示。一共存在两种不同的存储memory和file，对于control block，两边是单独采用mmap进行映射；对于buf，将两块连续的memory都映射到文件的同一块区域，目的是为了环型缓存下依旧可以获取一个连续的内存空间。
+<img src="/image/cueue_memory.png" alt="" />
+其中memory的两块绿色的buf和file中黄色的区域大小是相同的。</p>
+<h1 id="du-xie-she-ji">读写设计</h1>
+<p>ControlBlock是读写之间共享的结构体，ControlBlock的结构中只有两个原子变量，这个结构体会由Writer和Reader共同持有。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#65737e;">/// The shared metadata of a Cueue.
+</span><span style="color:#65737e;">///
+</span><span style="color:#65737e;">/// Cueue is empty if R == W
+</span><span style="color:#65737e;">/// Cueue is full if W == R+capacity
+</span><span style="color:#65737e;">/// Invariant: W &gt;= R
+</span><span style="color:#65737e;">/// Invariant: R + capacity &gt;= W
+</span><span>#[</span><span style="color:#bf616a;">derive</span><span>(Default)]
+</span><span style="color:#b48ead;">struct </span><span>ControlBlock {
+</span><span>    </span><span style="color:#bf616a;">write_position</span><span>: CacheLineAlignedAU64,
+</span><span>    </span><span style="color:#bf616a;">read_position</span><span>: CacheLineAlignedAU64,
+</span><span>}
+</span></code></pre>
+<h2 id="writer">Writer</h2>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#65737e;">/// Writer of a Cueue.
+</span><span style="color:#65737e;">///
+</span><span style="color:#65737e;">/// See examples/ for usage.
+</span><span style="color:#b48ead;">pub struct </span><span>Writer&lt;T&gt; {
+</span><span>    </span><span style="color:#bf616a;">mem</span><span>: std::sync::Arc&lt;MemoryMapInitialized&lt;T&gt;&gt;,
+</span><span>    </span><span style="color:#bf616a;">cb</span><span>: </span><span style="color:#b48ead;">*mut</span><span> ControlBlock,
+</span><span>    </span><span style="color:#bf616a;">mask</span><span>: </span><span style="color:#b48ead;">u64</span><span>,  </span><span style="color:#65737e;">// cap - 1, 当index超过了cap之后, index &amp; mask 可以用来获取真实的index
+</span><span>
+</span><span>    </span><span style="color:#bf616a;">buffer</span><span>: </span><span style="color:#b48ead;">*mut</span><span> T, </span><span style="color:#65737e;">// buf 内存的起点
+</span><span>    </span><span style="color:#bf616a;">write_begin</span><span>: </span><span style="color:#b48ead;">*mut</span><span> T, </span><span style="color:#65737e;">// 考虑 真实index后的内存写入位置
+</span><span>    </span><span style="color:#bf616a;">write_capacity</span><span>: </span><span style="color:#b48ead;">usize</span><span>, </span><span style="color:#65737e;">// 还剩多少空间
+</span><span>}
+</span></code></pre>
+<p>write_chunk的实现如下所示：</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>    </span><span style="color:#65737e;">/// Get a writable slice of maximum available size.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// The elements in the returned slice are either default initialized
+</span><span>    </span><span style="color:#65737e;">/// (never written yet) or are the result of previous writes.
+</span><span>    </span><span style="color:#65737e;">/// The writer is free to overwrite or reuse them.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// After write, `commit` must be called, to make the written elements
+</span><span>    </span><span style="color:#65737e;">/// available for reading.
+</span><span>    </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">write_chunk</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>) -&gt; &amp;</span><span style="color:#b48ead;">mut </span><span>[T] {
+</span><span>	    </span><span style="color:#65737e;">// 获取读、写的位置
+</span><span>        </span><span style="color:#b48ead;">let</span><span> w = </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">write_pos</span><span>().</span><span style="color:#96b5b4;">load</span><span>(Ordering::Relaxed); 
+</span><span>        </span><span style="color:#b48ead;">let</span><span> r = </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">read_pos</span><span>().</span><span style="color:#96b5b4;">load</span><span>(Ordering::Acquire);
+</span><span>
+</span><span>        debug_assert!(r &lt;= w);
+</span><span>        debug_assert!(r + </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">capacity</span><span>() as </span><span style="color:#b48ead;">u64 </span><span>&gt;= w);
+</span><span>		</span><span style="color:#65737e;">// 获取写入的真实index，&amp; self.mask 相当于 % cap
+</span><span>        </span><span style="color:#b48ead;">let</span><span> wi = w &amp; </span><span style="color:#bf616a;">self</span><span>.mask;
+</span><span>        </span><span style="color:#65737e;">// w.wrapping_sub(r)计算得到使用的内存空间大小
+</span><span>        </span><span style="color:#bf616a;">self</span><span>.write_capacity = (</span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">capacity</span><span>() as </span><span style="color:#b48ead;">u64 </span><span>- (w.</span><span style="color:#96b5b4;">wrapping_sub</span><span>(r))) as </span><span style="color:#b48ead;">usize</span><span>;
+</span><span>
+</span><span>        </span><span style="color:#b48ead;">unsafe </span><span>{
+</span><span>            </span><span style="color:#bf616a;">self</span><span>.write_begin = </span><span style="color:#bf616a;">self</span><span>.buffer.</span><span style="color:#96b5b4;">offset</span><span>(wi as </span><span style="color:#b48ead;">isize</span><span>);
+</span><span>            </span><span style="color:#65737e;">// 由于特殊的存储设计，即使 write_begin在 第一个buffer的结束位置
+</span><span>            </span><span style="color:#65737e;">// 也能拿到对应的存储
+</span><span>            std::slice::from_raw_parts_mut(</span><span style="color:#bf616a;">self</span><span>.write_begin, </span><span style="color:#bf616a;">self</span><span>.write_capacity)
+</span><span>        }
+</span><span>    }
+</span></code></pre>
+<p>如下图所示，当wi=ri的时候，返回的chunk即黑色的那一块内存，对于使用方来说这是一个可变的slice。由于mmap映射了buf(2)，对应的数据也会出现在buf的前面一段。
+<img src="/image/cueue_memory2.png" alt="" /></p>
+<p>写入完成之后，可以调用Writer.commit来提交写入，这里会修改controlBlock中的<code>write_position</code>，这样Reader中才能知道有数据写入。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>    </span><span style="color:#65737e;">/// Make `n` number of elements, written to the slice returned by `write_chunk`
+</span><span>    </span><span style="color:#65737e;">/// available for reading.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// `n` is checked: if too large, gets truncated to the maximum committable size.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// Returns the number of committed elements.
+</span><span>    </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">commit</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">n</span><span>: </span><span style="color:#b48ead;">usize</span><span>) -&gt; </span><span style="color:#b48ead;">usize </span><span>{
+</span><span>        </span><span style="color:#b48ead;">let</span><span> m = </span><span style="color:#b48ead;">usize</span><span>::min(</span><span style="color:#bf616a;">self</span><span>.write_capacity, n);
+</span><span>        </span><span style="color:#b48ead;">unsafe </span><span>{
+</span><span>            </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">unchecked_commit</span><span>(m);
+</span><span>        }
+</span><span>        m
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">unsafe fn </span><span style="color:#8fa1b3;">unchecked_commit</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">n</span><span>: </span><span style="color:#b48ead;">usize</span><span>) {
+</span><span>        </span><span style="color:#b48ead;">let</span><span> w = </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">write_pos</span><span>().</span><span style="color:#96b5b4;">load</span><span>(Ordering::Relaxed);
+</span><span>        </span><span style="color:#bf616a;">self</span><span>.write_begin = </span><span style="color:#bf616a;">self</span><span>.write_begin.</span><span style="color:#96b5b4;">add</span><span>(n);
+</span><span>        </span><span style="color:#bf616a;">self</span><span>.write_capacity -= n;
+</span><span>        </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">write_pos</span><span>().</span><span style="color:#96b5b4;">store</span><span>(w + n as </span><span style="color:#b48ead;">u64</span><span>, Ordering::Release);
+</span><span>    }
+</span></code></pre>
+<h2 id="reader">Reader</h2>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#65737e;">/// Reader of a Cueue.
+</span><span style="color:#65737e;">///
+</span><span style="color:#65737e;">/// See examples/ for usage.
+</span><span style="color:#b48ead;">pub struct </span><span>Reader&lt;T&gt; {
+</span><span>    </span><span style="color:#bf616a;">mem</span><span>: std::sync::Arc&lt;MemoryMapInitialized&lt;T&gt;&gt;,
+</span><span>    </span><span style="color:#bf616a;">cb</span><span>: </span><span style="color:#b48ead;">*mut</span><span> ControlBlock,
+</span><span>    </span><span style="color:#bf616a;">mask</span><span>: </span><span style="color:#b48ead;">u64</span><span>,
+</span><span>
+</span><span>    </span><span style="color:#bf616a;">buffer</span><span>: </span><span style="color:#b48ead;">*const</span><span> T,
+</span><span>    </span><span style="color:#bf616a;">read_begin</span><span>: </span><span style="color:#b48ead;">*const</span><span> T,
+</span><span>    </span><span style="color:#bf616a;">read_size</span><span>: </span><span style="color:#b48ead;">u64</span><span>,
+</span><span>}
+</span></code></pre>
+<p>Reader中的逻辑和Writer类似，尤其是read_chunk的逻辑，只是返回的数据类型是一个不可变的slice。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>    </span><span style="color:#65737e;">/// Return a slice of elements written and committed by the Writer.
+</span><span>    </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">read_chunk</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>) -&gt; &amp;[T] {
+</span><span>        </span><span style="color:#b48ead;">let</span><span> w = </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">write_pos</span><span>().</span><span style="color:#96b5b4;">load</span><span>(Ordering::Acquire);
+</span><span>        </span><span style="color:#b48ead;">let</span><span> r = </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">read_pos</span><span>().</span><span style="color:#96b5b4;">load</span><span>(Ordering::Relaxed);
+</span><span>
+</span><span>        debug_assert!(r &lt;= w);
+</span><span>        debug_assert!(r + </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">capacity</span><span>() as </span><span style="color:#b48ead;">u64 </span><span>&gt;= w);
+</span><span>
+</span><span>        </span><span style="color:#b48ead;">let</span><span> ri = r &amp; </span><span style="color:#bf616a;">self</span><span>.mask;
+</span><span>
+</span><span>        </span><span style="color:#bf616a;">self</span><span>.read_size = w - r;
+</span><span>
+</span><span>        </span><span style="color:#b48ead;">unsafe </span><span>{
+</span><span>            </span><span style="color:#bf616a;">self</span><span>.read_begin = </span><span style="color:#bf616a;">self</span><span>.buffer.</span><span style="color:#96b5b4;">offset</span><span>(ri as </span><span style="color:#b48ead;">isize</span><span>);
+</span><span>            std::slice::from_raw_parts(</span><span style="color:#bf616a;">self</span><span>.read_begin, </span><span style="color:#bf616a;">self</span><span>.read_size as </span><span style="color:#b48ead;">usize</span><span>)
+</span><span>        }
+</span><span>    }
+</span></code></pre>
+<p>数据读取完之后也需要提交</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>    </span><span style="color:#65737e;">/// Mark the slice previously acquired by `read_chunk` as consumed,
+</span><span>    </span><span style="color:#65737e;">/// making it available for writing.
+</span><span>    </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">commit</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>) {
+</span><span>        </span><span style="color:#b48ead;">let</span><span> r = </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">read_pos</span><span>().</span><span style="color:#96b5b4;">load</span><span>(Ordering::Relaxed);
+</span><span>        </span><span style="color:#b48ead;">let</span><span> rs = </span><span style="color:#bf616a;">self</span><span>.read_size;
+</span><span>        </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">read_pos</span><span>().</span><span style="color:#96b5b4;">store</span><span>(r + rs, Ordering::Release);
+</span><span>    }
+</span></code></pre>
+<h1 id="yi-xie-xi-jie">一些细节</h1>
+<h2 id="xi-tong-diao-yong">系统调用</h2>
+<p>这里就不详细说明了，主要起作用的系统调用是mmap。</p>
+<ol>
+<li>ftruncate</li>
+<li>mmap</li>
+<li>munmap</li>
+<li>sysconf</li>
+<li>mkstemp(macos)</li>
+<li>shm_open(macos)</li>
+<li>memfd_create(linux)</li>
+</ol>
+<h2 id="nei-cun-shun-xu">内存顺序</h2>
+<p>考虑多线程情况下的Reader和Writer访问原子变量的情况。如下图所示
+<img src="/image/cueue_memory1.png" alt="" />
+可以看到Writer采用release的order来存储<code>write pos</code>，当Reader按照acquire ordering读取<code>write pos</code>，假如读到了<code>write pos</code>的本次变化，那么之后在内存中也能读到对应的数据。同理，当Writer按照acquire ordering读取<code>read pos</code>，假如读到了<code>read pos</code>，也能确认内存中的这块数据被读取了（或者说适用方手动调用了commit）。</p>
+<p>Release-Acquire in C++ Reference:
+&gt;If an atomic store in thread A is tagged memory_order_release and an atomic load in thread B from the same variable is tagged memory_order_acquire, all memory writes (non-atomic and relaxed atomic) that <em>happened-before</em> the atomic store from the point of view of thread A, become <em>visible side-effects</em> in thread B. That is, once the atomic load is completed, thread B is guaranteed to see everything thread A wrote to memory. This promise only holds if B actually returns the value that A stored, or a value from later in the release sequence.</p>
+<h1 id="xue-dao-de-nei-rong">学到的内容</h1>
+<ol>
+<li>利用mmap把两块连续的内存和同一个文件绑定，即使是ring buffer也能对外提供类似数组（slice）的体验，提供批处理的能力。</li>
+<li>Release-Acquire的合理使用。Release可以认为是把写入发布出去，Acquire可以理解是尝试读取。</li>
+</ol>
+<h1 id="another-similar-crate-rtrb">Another Similar Crate: rtrb</h1>
+<p>设容量为C，存储的大小也为C。有两个指针，head和tail，取值在$[0, 2*C-1]$。存储的图如下所示，黄色的块是存储，其大小为C，pointer range的大小是2C。
+<img src="/image/rtrb.png" alt="rtrb" /></p>
+<p>这两个指针会被映射到Memory上的位置，映射方式如下代码所示（是一种ring buffer的实现方式）。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>    </span><span style="color:#65737e;">/// Wraps a position from the range `0 .. 2 * capacity` to `0 .. capacity`.
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">collapse_position</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">pos</span><span>: </span><span style="color:#b48ead;">usize</span><span>) -&gt; </span><span style="color:#b48ead;">usize </span><span>{
+</span><span>        debug_assert!(pos == </span><span style="color:#d08770;">0 </span><span>|| pos &lt; </span><span style="color:#d08770;">2 </span><span>* </span><span style="color:#bf616a;">self</span><span>.capacity);
+</span><span>        </span><span style="color:#b48ead;">if</span><span> pos &lt; </span><span style="color:#bf616a;">self</span><span>.capacity {
+</span><span>            pos
+</span><span>        } </span><span style="color:#b48ead;">else </span><span>{
+</span><span>            pos - </span><span style="color:#bf616a;">self</span><span>.capacity
+</span><span>        }
+</span><span>    }
+</span></code></pre>
+<p>Writer和Reader会维护head和tail这两个指针，来实现安全的读写。</p>
+<table><thead><tr><th></th><th>atomic head</th><th>atomic tail</th></tr></thead><tbody>
+<tr><td>Writer</td><td>only load</td><td>only write</td></tr>
+<tr><td>Reader</td><td>only write</td><td>only load</td></tr>
+</tbody></table>
+<p>Writer和Reader内部还会维护各自的head和tail指针，其中Writer需要时不时加载atomic head，Reader需要时不时加载atomic tail。</p>
+<p>为什么只需要时不时加载？而不是一直读取atomic tail/head？</p>
+<ol>
+<li>对于Writer，不断push的时候，只需要根据本地的head和tail来判断是否buffer满了。因为即使Reader在更新atomic head，也只会先出现本地head+atomic tail算出的buffer使用容量先到cap。</li>
+<li>对于Reader逻辑类似。</li>
+</ol>
+
+    </div>
+
+    
+    
+
+    <div class="post-footer">
+        
+            
+                <div class="post-tags">
+                    
+                        <a href="https://harpsword.github.io/tags/rust/">#Rust</a>
+                    
+                </div>
+            
+            
+
+        
+
+    </div>
+
+    
+    
+</article>
+
+
+                </div>
+            </main>
+
+            
+            
+        </div>
+
+      
+          <script type="text/javascript" src="https://harpsword.github.io/even.js" ></script>
+      
+    </body>
+
+</html>

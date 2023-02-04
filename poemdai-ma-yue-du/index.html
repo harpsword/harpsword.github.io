@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+      <!-- Enable responsiveness on mobile devices-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+      <title>yu&#x27;s blog - poem代码阅读</title>
+
+      
+
+      
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/slideout/1.0.1/slideout.min.js"></script>
+          
+      
+
+      
+          <link rel="stylesheet" href="https://harpsword.github.io/site.css">
+          
+      
+
+      
+      
+    </head>
+
+    <body>
+        <div class="container">
+
+            <div id="mobile-navbar" class="mobile-navbar">
+              <div class="mobile-header-logo">
+                <a href="/" class="logo">Yu 的天地</a>
+              </div>
+              <div class="mobile-navbar-icon icon-out">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+
+            <nav id="mobile-menu" class="mobile-menu slideout-menu slideout-menu-left">
+              <ul class="mobile-menu-list">
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                            Home
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                            Categories
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                            Tags
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                            About
+                        </a>
+                    </li>
+                
+              </ul>
+            </nav>
+
+            <header id="header">
+                <div class="logo"><a href="https:&#x2F;&#x2F;harpsword.github.io">Yu 的天地</a></div>
+                <nav class="menu">
+                    <ul>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                                    Home
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                                    Categories
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                                    Tags
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                                    About
+                                </a>
+                            </li>
+                        
+                    </ul>
+                </nav>
+            </header>
+
+            <main>
+                <div class="content" id="mobile-panel">
+                    
+
+
+<div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content always-active">
+        <nav id="TableOfContents">
+            <ul>
+                
+                <li>
+                    <a href="https://harpsword.github.io/poemdai-ma-yue-du/#bei-jing" class="toc-link">背景</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/poemdai-ma-yue-du/#requestding-yi" class="toc-link">Request定义</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/poemdai-ma-yue-du/#responseding-yi" class="toc-link">Response定义</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/poemdai-ma-yue-du/#he-xin-traitding-yi" class="toc-link">核心 Trait定义</a>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/poemdai-ma-yue-du/#fromrequest" class="toc-link">FromRequest</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/poemdai-ma-yue-du/#intoresponse" class="toc-link">IntoResponse</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/poemdai-ma-yue-du/#endpoint-trait" class="toc-link">Endpoint trait</a>
+                        </li>
+                        
+                    </ul>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/poemdai-ma-yue-du/#middleware" class="toc-link">Middleware</a>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/poemdai-ma-yue-du/#he-xin-trait-middleware" class="toc-link">核心trait: Middleware</a>
+                        </li>
+                        
+                    </ul>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/poemdai-ma-yue-du/#router" class="toc-link">Router</a>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/poemdai-ma-yue-du/#routemethod" class="toc-link">RouteMethod</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/poemdai-ma-yue-du/#routescheme" class="toc-link">RouteScheme</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/poemdai-ma-yue-du/#routedomain" class="toc-link">RouteDomain</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/poemdai-ma-yue-du/#router-1" class="toc-link">Router</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/poemdai-ma-yue-du/#xun-zhao-guo-cheng" class="toc-link">寻找过程</a>
+                        </li>
+                        
+                    </ul>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/poemdai-ma-yue-du/#cuo-wu-chu-li-de-yi-ge-li-zi" class="toc-link">错误处理的一个例子</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/poemdai-ma-yue-du/#xue-dao-de-jing-yan" class="toc-link">学到的经验</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/poemdai-ma-yue-du/#fu-lu" class="toc-link">附录</a>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/poemdai-ma-yue-du/#a-handler-expand-jie-guo" class="toc-link">A. handler expand 结果</a>
+                        </li>
+                        
+                    </ul>
+                    
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+<article class="post">
+    
+    <header class="post__header">
+        <h1 class="post__title">
+            <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;poemdai-ma-yue-du&#x2F;">poem代码阅读</a>
+        </h1>
+        <div class="post__meta">
+            <span class="post__time">2022-08-07</span>
+            
+        </div>
+    </header>
+
+    <div class="post-content">
+      <h1 id="bei-jing">背景</h1>
+<p>在Rust语言写的包中，poem包是一个出名的http包，除了基础的HTTP服务功能，还支持很多功能，包括tls、
+session、log、错误处理等。</p>
+<h1 id="requestding-yi">Request定义</h1>
+<p>这些定义比较简单，在这里只是简单罗列一下。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#65737e;">/// Represents an HTTP request.
+</span><span>#[</span><span style="color:#bf616a;">derive</span><span>(Default)]
+</span><span style="color:#b48ead;">pub struct </span><span>Request {
+</span><span>    </span><span style="color:#bf616a;">method</span><span>: Method,
+</span><span>    </span><span style="color:#bf616a;">uri</span><span>: Uri,
+</span><span>    </span><span style="color:#bf616a;">version</span><span>: Version,
+</span><span>    </span><span style="color:#bf616a;">headers</span><span>: HeaderMap,
+</span><span>    </span><span style="color:#bf616a;">extensions</span><span>: Extensions,
+</span><span>    </span><span style="color:#bf616a;">body</span><span>: Body,
+</span><span>    </span><span style="color:#bf616a;">state</span><span>: RequestState,
+</span><span>}
+</span></code></pre>
+<p>其他结构体</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub</span><span>(</span><span style="color:#b48ead;">crate</span><span>) </span><span style="color:#b48ead;">struct </span><span>RequestState {
+</span><span>    </span><span style="color:#b48ead;">pub</span><span>(</span><span style="color:#b48ead;">crate</span><span>) </span><span style="color:#bf616a;">local_addr</span><span>: LocalAddr,
+</span><span>    </span><span style="color:#b48ead;">pub</span><span>(</span><span style="color:#b48ead;">crate</span><span>) </span><span style="color:#bf616a;">remote_addr</span><span>: RemoteAddr,
+</span><span>    </span><span style="color:#b48ead;">pub</span><span>(</span><span style="color:#b48ead;">crate</span><span>) </span><span style="color:#bf616a;">scheme</span><span>: Scheme,
+</span><span>    </span><span style="color:#b48ead;">pub</span><span>(</span><span style="color:#b48ead;">crate</span><span>) </span><span style="color:#bf616a;">original_uri</span><span>: Uri,
+</span><span>    </span><span style="color:#b48ead;">pub</span><span>(</span><span style="color:#b48ead;">crate</span><span>) </span><span style="color:#bf616a;">match_params</span><span>: PathParams,
+</span><span>    #[</span><span style="color:#bf616a;">cfg</span><span>(feature = &quot;</span><span style="color:#a3be8c;">cookie</span><span>&quot;)]
+</span><span>    </span><span style="color:#b48ead;">pub</span><span>(</span><span style="color:#b48ead;">crate</span><span>) </span><span style="color:#bf616a;">cookie_jar</span><span>: Option&lt;CookieJar&gt;,
+</span><span>    </span><span style="color:#b48ead;">pub</span><span>(</span><span style="color:#b48ead;">crate</span><span>) </span><span style="color:#bf616a;">on_upgrade</span><span>: Mutex&lt;Option&lt;OnUpgrade&gt;&gt;,
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">pub struct </span><span>RequestParts {
+</span><span>    </span><span style="color:#65737e;">/// The request’s method
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">method</span><span>: Method,
+</span><span>    </span><span style="color:#65737e;">/// The request’s URI
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">uri</span><span>: Uri,
+</span><span>    </span><span style="color:#65737e;">/// The request’s version
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">version</span><span>: Version,
+</span><span>    </span><span style="color:#65737e;">/// The request’s headers
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">headers</span><span>: HeaderMap,
+</span><span>    </span><span style="color:#65737e;">/// The request’s extensions
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">extensions</span><span>: Extensions,
+</span><span>    </span><span style="color:#b48ead;">pub</span><span>(</span><span style="color:#b48ead;">crate</span><span>) </span><span style="color:#bf616a;">state</span><span>: RequestState,
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">pub struct </span><span>RequestBuilder {
+</span><span>    </span><span style="color:#bf616a;">method</span><span>: Method,
+</span><span>    </span><span style="color:#bf616a;">uri</span><span>: Uri,
+</span><span>    </span><span style="color:#bf616a;">version</span><span>: Version,
+</span><span>    </span><span style="color:#bf616a;">headers</span><span>: HeaderMap,
+</span><span>    </span><span style="color:#bf616a;">extensions</span><span>: Extensions,
+</span><span>}
+</span></code></pre>
+<h1 id="responseding-yi">Response定义</h1>
+<p>定义代码如下所示</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#65737e;">/// Represents an HTTP response.
+</span><span>#[</span><span style="color:#bf616a;">derive</span><span>(Default)]
+</span><span style="color:#b48ead;">pub struct </span><span>Response {
+</span><span>    </span><span style="color:#bf616a;">status</span><span>: StatusCode,
+</span><span>    </span><span style="color:#bf616a;">version</span><span>: Version,
+</span><span>    </span><span style="color:#bf616a;">headers</span><span>: HeaderMap,
+</span><span>    </span><span style="color:#bf616a;">extensions</span><span>: Extensions,
+</span><span>    </span><span style="color:#bf616a;">body</span><span>: Body,
+</span><span>}
+</span></code></pre>
+<p>和Request类似，也有一些相似的结构体定义。同样<code>ResponseBuilder</code>相较于<code>Response</code>少了一个body字段。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#65737e;">/// Component parts of an HTTP Response.
+</span><span style="color:#65737e;">///
+</span><span style="color:#65737e;">/// The HTTP response head consists of a status, version, and a set of header
+</span><span style="color:#65737e;">/// fields.
+</span><span style="color:#b48ead;">pub struct </span><span>ResponseParts {
+</span><span>    </span><span style="color:#65737e;">/// The response’s status
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">status</span><span>: StatusCode,
+</span><span>    </span><span style="color:#65737e;">/// The response’s version
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">version</span><span>: Version,
+</span><span>    </span><span style="color:#65737e;">/// The response’s headers
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">headers</span><span>: HeaderMap,
+</span><span>    </span><span style="color:#65737e;">/// The response’s extensions
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">extensions</span><span>: Extensions,
+</span><span>}
+</span><span style="color:#65737e;">/// An response builder.
+</span><span style="color:#b48ead;">pub struct </span><span>ResponseBuilder {
+</span><span>    </span><span style="color:#bf616a;">status</span><span>: StatusCode,
+</span><span>    </span><span style="color:#bf616a;">version</span><span>: Version,
+</span><span>    </span><span style="color:#bf616a;">headers</span><span>: HeaderMap,
+</span><span>    </span><span style="color:#bf616a;">extensions</span><span>: Extensions,
+</span><span>}
+</span></code></pre>
+<h1 id="he-xin-traitding-yi">核心 Trait定义</h1>
+<h2 id="fromrequest">FromRequest</h2>
+<p>实现了<code>FromRequest</code> trait表示对应的数据能从<code>Reqeust</code>中获取到。采用async func的原因还未弄清楚。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>#[</span><span style="color:#bf616a;">async_trait</span><span>::</span><span style="color:#bf616a;">async_trait</span><span>]
+</span><span style="color:#b48ead;">pub trait </span><span>FromRequest&lt;&#39;a&gt;: Sized {
+</span><span>    </span><span style="color:#65737e;">/// Extract from request head and body.
+</span><span>    async </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">from_request</span><span>(</span><span style="color:#bf616a;">req</span><span>: &amp;</span><span style="color:#b48ead;">&#39;a</span><span> Request, </span><span style="color:#bf616a;">body</span><span>: &amp;</span><span style="color:#b48ead;">mut</span><span> RequestBody) -&gt; Result&lt;</span><span style="color:#b48ead;">Self</span><span>&gt;;
+</span><span>
+</span><span>    </span><span style="color:#65737e;">/// Extract from request head.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// If you know that this type does not need to extract the body, then you
+</span><span>    </span><span style="color:#65737e;">/// can just use it.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// For example [`Query`], [`Path`] they only extract the content from the
+</span><span>    </span><span style="color:#65737e;">/// request head, using this method would be more convenient.
+</span><span>    </span><span style="color:#65737e;">/// `String`,`Vec&lt;u8&gt;` they extract the body of the request, using this
+</span><span>    </span><span style="color:#65737e;">/// method will cause `ReadBodyError` error.
+</span><span>    async </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">from_request_without_body</span><span>(</span><span style="color:#bf616a;">req</span><span>: &amp;</span><span style="color:#b48ead;">&#39;a</span><span> Request) -&gt; Result&lt;</span><span style="color:#b48ead;">Self</span><span>&gt; {
+</span><span>        </span><span style="color:#b48ead;">Self</span><span>::from_request(req, &amp;</span><span style="color:#b48ead;">mut </span><span>Default::default()).await
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h2 id="intoresponse">IntoResponse</h2>
+<p>定义这个trait之后，在Endpoint中可以直接利用这个trait来定义Endpoint的返回值，用户只需要对自定义struct实现该接口，就可以把该自定义struct作为Endpoint定义函数的返回值。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub trait </span><span>IntoResponse: Send {
+</span><span>    </span><span style="color:#65737e;">/// Consume itself and return [`Response`].
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">into_response</span><span>(</span><span style="color:#bf616a;">self</span><span>) -&gt; Response;
+</span><span>
+</span><span>    </span><span style="color:#65737e;">/// Wrap an `impl IntoResponse` to add a header.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// # Example
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// ```
+</span><span>    </span><span style="color:#65737e;">/// use poem::{http::HeaderValue, IntoResponse};
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+</span><span>    </span><span style="color:#65737e;">/// let resp = &quot;hello&quot;.with_header(&quot;foo&quot;, &quot;bar&quot;).into_response();
+</span><span>    </span><span style="color:#65737e;">/// assert_eq!(
+</span><span>    </span><span style="color:#65737e;">///     resp.headers().get(&quot;foo&quot;),
+</span><span>    </span><span style="color:#65737e;">///     Some(&amp;HeaderValue::from_static(&quot;bar&quot;))
+</span><span>    </span><span style="color:#65737e;">/// );
+</span><span>    </span><span style="color:#65737e;">/// assert_eq!(resp.into_body().into_string().await.unwrap(), &quot;hello&quot;);
+</span><span>    </span><span style="color:#65737e;">/// # });
+</span><span>    </span><span style="color:#65737e;">/// ```
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">with_header</span><span>&lt;K, V&gt;(</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">key</span><span>: K, </span><span style="color:#bf616a;">value</span><span>: V) -&gt; WithHeader&lt;</span><span style="color:#b48ead;">Self</span><span>&gt;
+</span><span>    </span><span style="color:#b48ead;">where
+</span><span>        K: TryInto&lt;HeaderName&gt;,
+</span><span>        V: TryInto&lt;HeaderValue&gt;,
+</span><span>        </span><span style="color:#b48ead;">Self</span><span>: Sized,
+</span><span>    {
+</span><span>        </span><span style="color:#b48ead;">let</span><span> key = key.</span><span style="color:#96b5b4;">try_into</span><span>().</span><span style="color:#96b5b4;">ok</span><span>();
+</span><span>        </span><span style="color:#b48ead;">let</span><span> value = value.</span><span style="color:#96b5b4;">try_into</span><span>().</span><span style="color:#96b5b4;">ok</span><span>();
+</span><span>
+</span><span>        WithHeader {
+</span><span>            inner: </span><span style="color:#bf616a;">self</span><span>,
+</span><span>            header: key.</span><span style="color:#96b5b4;">zip</span><span>(value),
+</span><span>        }
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#65737e;">/// Wrap an `impl IntoResponse` to with a new content type.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// # Example
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// ```
+</span><span>    </span><span style="color:#65737e;">/// use poem::{http::HeaderValue, IntoResponse};
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+</span><span>    </span><span style="color:#65737e;">/// let resp = &quot;hello&quot;.with_content_type(&quot;text/abc&quot;).into_response();
+</span><span>    </span><span style="color:#65737e;">/// assert_eq!(resp.content_type(), Some(&quot;text/abc&quot;));
+</span><span>    </span><span style="color:#65737e;">/// # });
+</span><span>    </span><span style="color:#65737e;">/// ```
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">with_content_type</span><span>&lt;V&gt;(</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">content_type</span><span>: V) -&gt; WithContentType&lt;</span><span style="color:#b48ead;">Self</span><span>&gt;
+</span><span>    </span><span style="color:#b48ead;">where
+</span><span>        V: TryInto&lt;HeaderValue&gt;,
+</span><span>        </span><span style="color:#b48ead;">Self</span><span>: Sized,
+</span><span>    {
+</span><span>        WithContentType {
+</span><span>            inner: </span><span style="color:#bf616a;">self</span><span>,
+</span><span>            content_type: content_type.</span><span style="color:#96b5b4;">try_into</span><span>().</span><span style="color:#96b5b4;">ok</span><span>(),
+</span><span>        }
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#65737e;">/// Wrap an `impl IntoResponse` to set a status code.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// # Example
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// ```
+</span><span>    </span><span style="color:#65737e;">/// use poem::{http::StatusCode, IntoResponse};
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+</span><span>    </span><span style="color:#65737e;">/// let resp = &quot;hello&quot;.with_status(StatusCode::CONFLICT).into_response();
+</span><span>    </span><span style="color:#65737e;">/// assert_eq!(resp.status(), StatusCode::CONFLICT);
+</span><span>    </span><span style="color:#65737e;">/// assert_eq!(resp.into_body().into_string().await.unwrap(), &quot;hello&quot;);
+</span><span>    </span><span style="color:#65737e;">/// # });
+</span><span>    </span><span style="color:#65737e;">/// ```
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">with_status</span><span>(</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">status</span><span>: StatusCode) -&gt; WithStatus&lt;</span><span style="color:#b48ead;">Self</span><span>&gt;
+</span><span>    </span><span style="color:#b48ead;">where
+</span><span>        </span><span style="color:#b48ead;">Self</span><span>: Sized,
+</span><span>    {
+</span><span>        WithStatus {
+</span><span>            inner: </span><span style="color:#bf616a;">self</span><span>,
+</span><span>            status,
+</span><span>        }
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#65737e;">/// Wrap an `impl IntoResponse` to set a body.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// # Example
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// ```
+</span><span>    </span><span style="color:#65737e;">/// use poem::{http::StatusCode, IntoResponse};
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+</span><span>    </span><span style="color:#65737e;">/// let resp = StatusCode::CONFLICT.with_body(&quot;hello&quot;).into_response();
+</span><span>    </span><span style="color:#65737e;">/// assert_eq!(resp.status(), StatusCode::CONFLICT);
+</span><span>    </span><span style="color:#65737e;">/// assert_eq!(resp.into_body().into_string().await.unwrap(), &quot;hello&quot;);
+</span><span>    </span><span style="color:#65737e;">/// # });
+</span><span>    </span><span style="color:#65737e;">/// ```
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">with_body</span><span>(</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">body</span><span>: impl Into&lt;Body&gt;) -&gt; WithBody&lt;</span><span style="color:#b48ead;">Self</span><span>&gt;
+</span><span>    </span><span style="color:#b48ead;">where
+</span><span>        </span><span style="color:#b48ead;">Self</span><span>: Sized,
+</span><span>    {
+</span><span>        WithBody {
+</span><span>            inner: </span><span style="color:#bf616a;">self</span><span>,
+</span><span>            body: body.</span><span style="color:#96b5b4;">into</span><span>(),
+</span><span>        }
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h2 id="endpoint-trait">Endpoint trait</h2>
+<p>核心 trait: Endpoint，如下代码所示，方法get_response有基本的实现，所以实现Endpoint方法时只需要实现call方法即可。这个trait和tower的Service trait抽象类似，只是更简单。</p>
+<p>该trait利用了 <code>async_trait::async_trait</code>包来定义async func in trait. 没有这个包时无法定义async func in trait，可以阅读这篇文章来进一步了解<a href="https://smallcultfollowing.com/babysteps/blog/2019/10/26/async-fn-in-traits-are-hard/">why async fn in traits are hard</a> </p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#65737e;">/// An HTTP request handler.
+</span><span>#[</span><span style="color:#bf616a;">async_trait</span><span>::</span><span style="color:#bf616a;">async_trait</span><span>]
+</span><span style="color:#b48ead;">pub trait </span><span>Endpoint: Send + Sync {
+</span><span>    </span><span style="color:#65737e;">/// Represents the response of the endpoint.
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Output: IntoResponse;
+</span><span>
+</span><span>    </span><span style="color:#65737e;">/// Get the response to the request.
+</span><span>    async </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">call</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">req</span><span>: Request) -&gt; Result&lt;</span><span style="color:#b48ead;">Self::</span><span>Output&gt;;
+</span><span>
+</span><span>    </span><span style="color:#65737e;">/// Get the response to the request and return a [`Response`].
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// Unlike [`Endpoint::call`], when an error occurs, it will also convert
+</span><span>    </span><span style="color:#65737e;">/// the error into a response object.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// # Example
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// ```
+</span><span>    </span><span style="color:#65737e;">/// use poem::{
+</span><span>    </span><span style="color:#65737e;">///     error::NotFoundError, handler, http::StatusCode, test::TestClient, Endpoint, Request,
+</span><span>    </span><span style="color:#65737e;">///     Result,
+</span><span>    </span><span style="color:#65737e;">/// };
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// #[handler]
+</span><span>    </span><span style="color:#65737e;">/// fn index() -&gt; Result&lt;()&gt; {
+</span><span>    </span><span style="color:#65737e;">///     Err(NotFoundError.into())
+</span><span>    </span><span style="color:#65737e;">/// }
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+</span><span>    </span><span style="color:#65737e;">/// TestClient::new(index)
+</span><span>    </span><span style="color:#65737e;">///     .get(&quot;/&quot;)
+</span><span>    </span><span style="color:#65737e;">///     .send()
+</span><span>    </span><span style="color:#65737e;">///     .await
+</span><span>    </span><span style="color:#65737e;">///     .assert_status(StatusCode::NOT_FOUND);
+</span><span>    </span><span style="color:#65737e;">/// # });
+</span><span>    </span><span style="color:#65737e;">/// ```
+</span><span>    async </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">get_response</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">req</span><span>: Request) -&gt; Response {
+</span><span>        </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">call</span><span>(req)
+</span><span>            .await
+</span><span>            .</span><span style="color:#96b5b4;">map</span><span>(IntoResponse::into_response)
+</span><span>            .</span><span style="color:#96b5b4;">unwrap_or_else</span><span>(|</span><span style="color:#bf616a;">err</span><span>| err.</span><span style="color:#96b5b4;">into_response</span><span>())
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<p>IntoEndpoint trait定义</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub trait </span><span>IntoEndpoint {
+</span><span>    </span><span style="color:#65737e;">/// Represents the endpoint type.
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Endpoint: Endpoint;
+</span><span>
+</span><span>    </span><span style="color:#65737e;">/// Converts this object into endpoint.
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">into_endpoint</span><span>(</span><span style="color:#bf616a;">self</span><span>) -&gt; </span><span style="color:#b48ead;">Self::</span><span>Endpoint;
+</span><span>}
+</span><span style="color:#65737e;">// 对于实现了Endpoint trait的类型，自动实现IntoEndpoint
+</span><span style="color:#b48ead;">impl</span><span>&lt;T: Endpoint&gt; IntoEndpoint </span><span style="color:#b48ead;">for </span><span>T {
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Endpoint = T;
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">into_endpoint</span><span>(</span><span style="color:#bf616a;">self</span><span>) -&gt; </span><span style="color:#b48ead;">Self::</span><span>Endpoint {
+</span><span>        </span><span style="color:#bf616a;">self
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h3 id="endpointext">EndpointExt</h3>
+<p>EndpointExt 中有很多很有意思的方法，比如<code>before</code>, <code>after</code>, <code>around</code>等等，可以对Endpoint的各个部分做定制化逻辑。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub trait </span><span>EndpointExt: IntoEndpoint {
+</span><span>	 </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">boxed</span><span>&lt;</span><span style="color:#b48ead;">&#39;a</span><span>&gt;(</span><span style="color:#bf616a;">self</span><span>) -&gt; BoxEndpoint&lt;</span><span style="color:#b48ead;">&#39;a</span><span>, &lt;</span><span style="color:#b48ead;">Self::</span><span>Endpoint as Endpoint&gt;::Output&gt;
+</span><span>    </span><span style="color:#b48ead;">where
+</span><span>        </span><span style="color:#b48ead;">Self</span><span>: Sized + </span><span style="color:#b48ead;">&#39;a</span><span>,
+</span><span>    {
+</span><span>        Box::new(</span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">into_endpoint</span><span>())
+</span><span>    }
+</span><span>    ....
+</span><span>}
+</span></code></pre>
+<h3 id="handler-hong">handler 宏</h3>
+<p>handler宏的目的是为了把一个async函数包装成一个<code>Endpoint</code>。</p>
+<p>example 如下所示。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>#[</span><span style="color:#bf616a;">handler</span><span>]
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">hello</span><span>(Path(</span><span style="color:#bf616a;">name</span><span>): Path&lt;String&gt;) -&gt; String {
+</span><span>    format!(&quot;</span><span style="color:#a3be8c;">hello: </span><span style="color:#d08770;">{}</span><span>&quot;, name)
+</span><span>}
+</span></code></pre>
+<p>expand之后的代码如下所示（经过删减），原始代码在附录A中。可以看到原始代码被塞在了<code>call</code>方法中。另外输入参数要求实现 <code>poem::FromRequest</code> trait，输出参数实现<code>poem::IntoResponse</code>trait。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">struct </span><span>Exmpale {}
+</span><span>#[</span><span style="color:#bf616a;">allow</span><span>(non_camel_case_types)]
+</span><span style="color:#b48ead;">struct </span><span>hello;
+</span><span style="color:#b48ead;">impl </span><span>poem::Endpoint </span><span style="color:#b48ead;">for </span><span>hello {
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Output = poem::Response;
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">call</span><span>&lt;</span><span style="color:#b48ead;">&#39;life0</span><span>, </span><span style="color:#b48ead;">&#39;async_trait</span><span>&gt;(
+</span><span>        &amp;</span><span style="color:#b48ead;">&#39;life0 </span><span style="color:#bf616a;">self</span><span>,
+</span><span>        </span><span style="color:#bf616a;">req</span><span>: poem::Request,
+</span><span>    ) -&gt; ::core::pin::Pin&lt;
+</span><span>        Box&lt;
+</span><span>            dyn ::core::future::Future&lt;Output = poem::Result&lt;</span><span style="color:#b48ead;">Self::</span><span>Output&gt;&gt;
+</span><span>                + ::core::marker::Send
+</span><span>                + </span><span style="color:#b48ead;">&#39;async_trait</span><span>,
+</span><span>        &gt;,
+</span><span>    &gt;
+</span><span>    </span><span style="color:#b48ead;">where
+</span><span>        </span><span style="color:#b48ead;">&#39;life0</span><span>: </span><span style="color:#b48ead;">&#39;async_trait</span><span>,
+</span><span>        </span><span style="color:#b48ead;">Self</span><span>: </span><span style="color:#b48ead;">&#39;async_trait</span><span>,
+</span><span>    {
+</span><span>        Box::pin(async </span><span style="color:#b48ead;">move </span><span>{
+</span><span>            </span><span style="color:#b48ead;">if let </span><span>::core::option::Option::Some(__ret) =
+</span><span>                ::core::option::Option::None::&lt;poem::Result&lt;</span><span style="color:#b48ead;">Self::</span><span>Output&gt;&gt;
+</span><span>            {
+</span><span>                </span><span style="color:#b48ead;">return</span><span> __ret;
+</span><span>            }
+</span><span>            </span><span style="color:#b48ead;">let</span><span> __self = </span><span style="color:#bf616a;">self</span><span>;
+</span><span>            </span><span style="color:#b48ead;">let mut</span><span> req = req;
+</span><span>            </span><span style="color:#b48ead;">let</span><span> __ret: poem::Result&lt;</span><span style="color:#b48ead;">Self::</span><span>Output&gt; = {
+</span><span>                </span><span style="color:#b48ead;">let </span><span>(req, </span><span style="color:#b48ead;">mut</span><span> body) = req.</span><span style="color:#96b5b4;">split</span><span>();
+</span><span>                </span><span style="color:#b48ead;">let</span><span> p0 = &lt;Path&lt;String&gt; as poem::FromRequest&gt;::from_request(&amp;req, &amp;</span><span style="color:#b48ead;">mut</span><span> body).await?;
+</span><span>                </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">hello</span><span>(Path(</span><span style="color:#bf616a;">name</span><span>): Path&lt;String&gt;) -&gt; String {
+</span><span>                    {
+</span><span>                        </span><span style="color:#b48ead;">let</span><span> res = ::alloc::fmt::format(::core::fmt::Arguments::new_v1(
+</span><span>                            &amp;[&quot;</span><span style="color:#a3be8c;">hello: </span><span>&quot;],
+</span><span>                            &amp;[::core::fmt::ArgumentV1::new_display(&amp;name)],
+</span><span>                        ));
+</span><span>                        res
+</span><span>                    }
+</span><span>                }
+</span><span>                </span><span style="color:#b48ead;">let</span><span> res = </span><span style="color:#96b5b4;">hello</span><span>(p0);
+</span><span>                </span><span style="color:#b48ead;">let</span><span> res = poem::error::IntoResult::into_result(res);
+</span><span>                std::result::Result::map(res, poem::IntoResponse::into_response)
+</span><span>            };
+</span><span>            #[</span><span style="color:#bf616a;">allow</span><span>(unreachable_code)]
+</span><span>            __ret
+</span><span>        })
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h1 id="middleware">Middleware</h1>
+<h2 id="he-xin-trait-middleware">核心trait: Middleware</h2>
+<p>目的是把一个Endpoint转换成另一个Endpoint。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub trait </span><span>Middleware&lt;E: Endpoint&gt; {
+</span><span>    </span><span style="color:#65737e;">/// New endpoint type.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// If you don&#39;t know what type to use, then you can use
+</span><span>    </span><span style="color:#65737e;">/// [`BoxEndpoint`](crate::endpoint::BoxEndpoint), which will bring some
+</span><span>    </span><span style="color:#65737e;">/// performance loss, but it is insignificant.
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Output: Endpoint;
+</span><span>
+</span><span>    </span><span style="color:#65737e;">/// Transform the input [`Endpoint`] to another one.
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">transform</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">ep</span><span>: E) -&gt; </span><span style="color:#b48ead;">Self::</span><span>Output;
+</span><span>}
+</span></code></pre>
+<p>poem中预先定义了很多Middleware</p>
+<h1 id="router">Router</h1>
+<h2 id="routemethod">RouteMethod</h2>
+<p>对于同一个url，不同的方法是绑在同一个<code>RouteMethod</code>上的。结构定义如下所示：</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>#[</span><span style="color:#bf616a;">derive</span><span>(Default)]
+</span><span style="color:#b48ead;">pub struct </span><span>RouteMethod {
+</span><span>    </span><span style="color:#bf616a;">methods</span><span>: Vec&lt;(Method, BoxEndpoint&lt;</span><span style="color:#b48ead;">&#39;static</span><span>&gt;)&gt;,
+</span><span>}
+</span><span>
+</span><span>#[</span><span style="color:#bf616a;">derive</span><span>(Clone, PartialEq, Eq, Hash)]
+</span><span style="color:#b48ead;">pub struct </span><span>Method(Inner);
+</span><span>
+</span><span>#[</span><span style="color:#bf616a;">derive</span><span>(Clone, PartialEq, Eq, Hash)]
+</span><span style="color:#b48ead;">enum </span><span>Inner {
+</span><span>    Options,
+</span><span>    Get,
+</span><span>    Post,
+</span><span>    Put,
+</span><span>    Delete,
+</span><span>    Head,
+</span><span>    Trace,
+</span><span>    Connect,
+</span><span>    Patch,
+</span><span>    </span><span style="color:#65737e;">// If the extension is short enough, store it inline
+</span><span>    ExtensionInline(InlineExtension),
+</span><span>    </span><span style="color:#65737e;">// Otherwise, allocate it
+</span><span>    ExtensionAllocated(AllocatedExtension),
+</span><span>}
+</span></code></pre>
+<p><code>RouteMethod</code>也实现了<code>Endpoint</code>trait，在执行过程中会遍历<code>methods</code>来查找对应的handler(也是<code>Endpoint</code>)。</p>
+<blockquote>
+<p>问题：为啥<code>RouteMethod.methods</code>是Vec？而不是Map。可能是Method的数量比较少，用Vec性能更好。</p>
+</blockquote>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>#[</span><span style="color:#bf616a;">async_trait</span><span>::</span><span style="color:#bf616a;">async_trait</span><span>]
+</span><span style="color:#b48ead;">impl </span><span>Endpoint </span><span style="color:#b48ead;">for </span><span>RouteMethod {
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Output = Response;
+</span><span>
+</span><span>    async </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">call</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">req</span><span>: Request) -&gt; Result&lt;</span><span style="color:#b48ead;">Self::</span><span>Output&gt; {
+</span><span>        </span><span style="color:#b48ead;">match </span><span style="color:#bf616a;">self
+</span><span>            .methods
+</span><span>            .</span><span style="color:#96b5b4;">iter</span><span>()
+</span><span>            .</span><span style="color:#96b5b4;">find</span><span>(|(</span><span style="color:#bf616a;">method</span><span>, _)| method == req.</span><span style="color:#96b5b4;">method</span><span>())
+</span><span>            .</span><span style="color:#96b5b4;">map</span><span>(|(_, </span><span style="color:#bf616a;">ep</span><span>)| ep)
+</span><span>        {
+</span><span>            Some(ep) =&gt; ep.</span><span style="color:#96b5b4;">call</span><span>(req).await,
+</span><span>            None =&gt; {
+</span><span>                </span><span style="color:#b48ead;">if</span><span> req.</span><span style="color:#96b5b4;">method</span><span>() == Method::</span><span style="color:#d08770;">HEAD </span><span>{
+</span><span>                    req.</span><span style="color:#96b5b4;">set_method</span><span>(Method::</span><span style="color:#d08770;">GET</span><span>);
+</span><span>                    </span><span style="color:#b48ead;">let mut</span><span> resp = </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">call</span><span>(req).await?;
+</span><span>                    resp.</span><span style="color:#96b5b4;">set_body</span><span>(());
+</span><span>                    </span><span style="color:#b48ead;">return </span><span>Ok(resp);
+</span><span>                }
+</span><span>                Err(MethodNotAllowedError.</span><span style="color:#96b5b4;">into</span><span>())
+</span><span>            }
+</span><span>        }
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h2 id="routescheme">RouteScheme</h2>
+<p>和RouteMethod不同，<code>RouteScheme</code>是在scheme维度上做路由，即http或者https</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#65737e;">/// Routing object for request scheme
+</span><span style="color:#65737e;">///
+</span><span style="color:#65737e;">/// # Errors
+</span><span style="color:#65737e;">///
+</span><span style="color:#65737e;">/// - [`NotFoundError`]
+</span><span>#[</span><span style="color:#bf616a;">derive</span><span>(Default)]
+</span><span style="color:#b48ead;">pub struct </span><span>RouteScheme {
+</span><span>    </span><span style="color:#bf616a;">schemes</span><span>: Vec&lt;(Scheme, BoxEndpoint&lt;</span><span style="color:#b48ead;">&#39;static</span><span>&gt;)&gt;,
+</span><span>    </span><span style="color:#bf616a;">fallback</span><span>: Option&lt;BoxEndpoint&lt;</span><span style="color:#b48ead;">&#39;static</span><span>&gt;&gt;,
+</span><span>}
+</span></code></pre>
+<h2 id="routedomain">RouteDomain</h2>
+<p><code>RouteDomain</code>是在域名维度上做路由</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>
+</span></code></pre>
+<h2 id="router-1">Router</h2>
+<p><code>Router</code>是在uri维度上做路由，采用RadixTree来作为数据结构（包括算法）。<a href="https://toutiao.io/posts/o9anj0/preview">RadixTree</a></p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>#[</span><span style="color:#bf616a;">derive</span><span>(Default)]
+</span><span style="color:#b48ead;">pub struct </span><span>Route {
+</span><span>    </span><span style="color:#bf616a;">tree</span><span>: RadixTree&lt;BoxEndpoint&lt;</span><span style="color:#b48ead;">&#39;static</span><span>&gt;&gt;,
+</span><span>}
+</span></code></pre>
+<p>Route也实现了 <code>Endpoint</code>，调用call的时候会找到对应匹配的<code>Endpoint</code>继续往下走，直到最终走到<code>#[handler]</code>生成的业务代码。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>#[</span><span style="color:#bf616a;">async_trait</span><span>::</span><span style="color:#bf616a;">async_trait</span><span>]
+</span><span style="color:#b48ead;">impl </span><span>Endpoint </span><span style="color:#b48ead;">for </span><span>Route {
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Output = Response;
+</span><span>
+</span><span>    async </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">call</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">req</span><span>: Request) -&gt; Result&lt;</span><span style="color:#b48ead;">Self::</span><span>Output&gt; {
+</span><span>        </span><span style="color:#b48ead;">match </span><span style="color:#bf616a;">self</span><span>.tree.</span><span style="color:#96b5b4;">matches</span><span>(req.</span><span style="color:#96b5b4;">uri</span><span>().</span><span style="color:#96b5b4;">path</span><span>()) {
+</span><span>            Some(matches) =&gt; {
+</span><span>                req.</span><span style="color:#96b5b4;">state_mut</span><span>().match_params.</span><span style="color:#96b5b4;">extend</span><span>(matches.params);
+</span><span>                matches.data.</span><span style="color:#96b5b4;">call</span><span>(req).await
+</span><span>            }
+</span><span>            None =&gt; Err(NotFoundError.</span><span style="color:#96b5b4;">into</span><span>()),
+</span><span>        }
+</span><span>    }
+</span><span>}
+</span><span>
+</span></code></pre>
+<h2 id="xun-zhao-guo-cheng">寻找过程</h2>
+<p>server.rs中的<code>serve_connection</code>是处理过程的入口，参数中的<code>ep</code>就是从 <code>server.run(route)</code>中不断往下传的route(struct Route)。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>async </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">serve_connection</span><span>(
+</span><span>    </span><span style="color:#bf616a;">socket</span><span>: impl AsyncRead + AsyncWrite + Send + Unpin + </span><span style="color:#b48ead;">&#39;static</span><span>,
+</span><span>    </span><span style="color:#bf616a;">local_addr</span><span>: LocalAddr,
+</span><span>    </span><span style="color:#bf616a;">remote_addr</span><span>: RemoteAddr,
+</span><span>    </span><span style="color:#bf616a;">scheme</span><span>: Scheme,
+</span><span>    </span><span style="color:#bf616a;">ep</span><span>: Arc&lt;dyn Endpoint&lt;Output = Response&gt;&gt;,
+</span><span>) {
+</span><span>    </span><span style="color:#b48ead;">let</span><span> service = hyper::service::service_fn({
+</span><span>        </span><span style="color:#b48ead;">move </span><span>|req: hyper::Request&lt;hyper::Body&gt;| {
+</span><span>            </span><span style="color:#b48ead;">let</span><span> ep = ep.</span><span style="color:#96b5b4;">clone</span><span>();
+</span><span>            </span><span style="color:#b48ead;">let</span><span> local_addr = local_addr.</span><span style="color:#96b5b4;">clone</span><span>();
+</span><span>            </span><span style="color:#b48ead;">let</span><span> remote_addr = remote_addr.</span><span style="color:#96b5b4;">clone</span><span>();
+</span><span>            </span><span style="color:#b48ead;">let</span><span> scheme = scheme.</span><span style="color:#96b5b4;">clone</span><span>();
+</span><span>            async </span><span style="color:#b48ead;">move </span><span>{
+</span><span>                Ok::&lt;http::Response&lt;_&gt;, Infallible&gt;(
+</span><span>                    ep.</span><span style="color:#96b5b4;">get_response</span><span>((req, local_addr, remote_addr, scheme).</span><span style="color:#96b5b4;">into</span><span>())
+</span><span>                        .await
+</span><span>                        .</span><span style="color:#96b5b4;">into</span><span>(),
+</span><span>                )
+</span><span>            }
+</span><span>        }
+</span><span>    });
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">let</span><span> conn = Http::new()
+</span><span>        .</span><span style="color:#96b5b4;">serve_connection</span><span>(socket, service)
+</span><span>        .</span><span style="color:#96b5b4;">with_upgrades</span><span>();
+</span><span>    </span><span style="color:#b48ead;">let </span><span>_ = conn.await;
+</span><span>}
+</span></code></pre>
+<h1 id="cuo-wu-chu-li-de-yi-ge-li-zi">错误处理的一个例子</h1>
+<p>下面是一个handler的写法，在这个写法中，Error将会采用用户自定义的Error。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>#[</span><span style="color:#bf616a;">derive</span><span>(Error, Debug)]
+</span><span style="color:#b48ead;">enum </span><span>MyError {
+</span><span>
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl </span><span>ResponseError </span><span style="color:#b48ead;">for </span><span>MyError {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">status</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>) -&gt; poem::http::StatusCode {
+</span><span>        StatusCode::</span><span style="color:#d08770;">BAD_REQUEST
+</span><span>    }
+</span><span>}
+</span><span>#[</span><span style="color:#bf616a;">handler</span><span>]
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">hello</span><span>(Path(</span><span style="color:#bf616a;">name</span><span>): Path&lt;String&gt;) -&gt; Result&lt;String, MyError&gt; {
+</span><span>    Ok(format!(&quot;</span><span style="color:#a3be8c;">hello: </span><span style="color:#d08770;">{}</span><span>&quot;, name))
+</span><span>}
+</span></code></pre>
+<p>核心处理部分expand之后的代码如下所示</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>			</span><span style="color:#b48ead;">let</span><span> __ret: poem::Result&lt;</span><span style="color:#b48ead;">Self::</span><span>Output&gt; = {
+</span><span>                </span><span style="color:#b48ead;">let </span><span>(req, </span><span style="color:#b48ead;">mut</span><span> body) = req.</span><span style="color:#96b5b4;">split</span><span>();
+</span><span>                </span><span style="color:#b48ead;">let</span><span> p0 = &lt;Path&lt;String&gt; as poem::FromRequest&gt;::from_request(&amp;req, &amp;</span><span style="color:#b48ead;">mut</span><span> body).await?;
+</span><span>                </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">hello</span><span>(Path(</span><span style="color:#bf616a;">name</span><span>): Path&lt;String&gt;) -&gt; Result&lt;String, MyError&gt; {
+</span><span>                    Ok({
+</span><span>                        </span><span style="color:#b48ead;">let</span><span> res = ::alloc::fmt::format(::core::fmt::Arguments::new_v1(
+</span><span>                            &amp;[&quot;</span><span style="color:#a3be8c;">hello: </span><span>&quot;],
+</span><span>                            &amp;[::core::fmt::ArgumentV1::new_display(&amp;name)],
+</span><span>                        ));
+</span><span>                        res
+</span><span>                    })
+</span><span>                }
+</span><span>                </span><span style="color:#b48ead;">let</span><span> res = </span><span style="color:#96b5b4;">hello</span><span>(p0);
+</span><span>                </span><span style="color:#b48ead;">let</span><span> res = poem::error::IntoResult::into_result(res);
+</span><span>                std::result::Result::map(res, poem::IntoResponse::into_response)
+</span><span>            };
+</span></code></pre>
+<p>可以看到只需要为<code>Result&lt;T, E&gt;</code>实现<code>IntoResult</code>即可。
+转换过程如下所示
+<code>MyError</code> -&gt; <code>StatusCode</code> -&gt; <code>poem::error::Error</code>
+调用方法<code>IntoResult::into_result</code>，会使用默认实现来转换<code>E</code>为<code>poem::error::Error</code>。恰好<code>E</code>实现了<code>ResponseError+StdError+Send+Sync+'static</code>，所以转换能够成功。设计很精巧，最初设计的时候应该会有一个详细的转换图来方便设计，没有这张图的话，阅读源码的时候很难找到对应的默认实现，</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub trait </span><span>IntoResult&lt;T: IntoResponse&gt; {
+</span><span>    </span><span style="color:#65737e;">/// Consumes this value returns a `poem::Result&lt;T&gt;`.
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">into_result</span><span>(</span><span style="color:#bf616a;">self</span><span>) -&gt; Result&lt;T&gt;;
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl</span><span>&lt;T, E&gt; IntoResult&lt;T&gt; </span><span style="color:#b48ead;">for </span><span>Result&lt;T, E&gt;
+</span><span style="color:#b48ead;">where
+</span><span>    T: IntoResponse,
+</span><span>    E: Into&lt;Error&gt; + Send + Sync + </span><span style="color:#b48ead;">&#39;static</span><span>,
+</span><span>{
+</span><span>    #[</span><span style="color:#bf616a;">inline</span><span>]
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">into_result</span><span>(</span><span style="color:#bf616a;">self</span><span>) -&gt; Result&lt;T&gt; {
+</span><span>        </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">map_err</span><span>(Into::into)
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl</span><span>&lt;T: IntoResponse&gt; IntoResult&lt;T&gt; </span><span style="color:#b48ead;">for </span><span>T {
+</span><span>    #[</span><span style="color:#bf616a;">inline</span><span>]
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">into_result</span><span>(</span><span style="color:#bf616a;">self</span><span>) -&gt; Result&lt;T&gt; {
+</span><span>        Ok(</span><span style="color:#bf616a;">self</span><span>)
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl</span><span>&lt;T: ResponseError + StdError + Send + Sync + </span><span style="color:#b48ead;">&#39;static</span><span>&gt; From&lt;T&gt; </span><span style="color:#b48ead;">for </span><span>Error {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">from</span><span>(</span><span style="color:#bf616a;">err</span><span>: T) -&gt; </span><span style="color:#b48ead;">Self </span><span>{
+</span><span>        Error {
+</span><span>            as_response: AsResponse::from_type::&lt;T&gt;(),
+</span><span>            source: Some(ErrorSource::BoxedError(Box::new(err))),
+</span><span>        }
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h1 id="xue-dao-de-jing-yan">学到的经验</h1>
+<ol>
+<li>链式套娃 <code>Endpoint</code> trait
+<ol>
+<li>把Router、RouteMethod、RouteScheme、RouteDomain都抽象为<code>Endpoint</code></li>
+<li>除了Router，还有Middleware,等等</li>
+</ol>
+</li>
+<li>类似<code>Response</code> struct和 <code>IntoResponse</code> trait，在关联类型上可以采用 <code>Response</code> struct；generic上采用<code>IntoResponse</code> bound.</li>
+</ol>
+<h1 id="fu-lu">附录</h1>
+<h2 id="a-handler-expand-jie-guo">A. handler expand 结果</h2>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>#![</span><span style="color:#bf616a;">feature</span><span>(prelude_import)]
+</span><span>#[</span><span style="color:#bf616a;">prelude_import</span><span>]
+</span><span style="color:#b48ead;">use </span><span>std::prelude::rust_2021::*;
+</span><span>#[</span><span style="color:#bf616a;">macro_use</span><span>]
+</span><span style="color:#b48ead;">extern crate</span><span> std;
+</span><span style="color:#b48ead;">use </span><span>poem::{handler, web::Path};
+</span><span style="color:#b48ead;">struct </span><span>Exmpale {}
+</span><span>#[</span><span style="color:#bf616a;">allow</span><span>(non_camel_case_types)]
+</span><span style="color:#b48ead;">struct </span><span>hello;
+</span><span style="color:#b48ead;">impl </span><span>poem::Endpoint </span><span style="color:#b48ead;">for </span><span>hello {
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Output = poem::Response;
+</span><span>    #[</span><span style="color:#bf616a;">allow</span><span>(unused_mut)]
+</span><span>    #[</span><span style="color:#bf616a;">allow</span><span>(
+</span><span>        clippy::let_unit_value,
+</span><span>        clippy::no_effect_underscore_binding,
+</span><span>        clippy::shadow_same,
+</span><span>        clippy::type_complexity,
+</span><span>        clippy::type_repetition_in_bounds,
+</span><span>        clippy::used_underscore_binding
+</span><span>    )]
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">call</span><span>&lt;</span><span style="color:#b48ead;">&#39;life0</span><span>, </span><span style="color:#b48ead;">&#39;async_trait</span><span>&gt;(
+</span><span>        &amp;</span><span style="color:#b48ead;">&#39;life0 </span><span style="color:#bf616a;">self</span><span>,
+</span><span>        </span><span style="color:#bf616a;">req</span><span>: poem::Request,
+</span><span>    ) -&gt; ::core::pin::Pin&lt;
+</span><span>        Box&lt;
+</span><span>            dyn ::core::future::Future&lt;Output = poem::Result&lt;</span><span style="color:#b48ead;">Self::</span><span>Output&gt;&gt;
+</span><span>                + ::core::marker::Send
+</span><span>                + </span><span style="color:#b48ead;">&#39;async_trait</span><span>,
+</span><span>        &gt;,
+</span><span>    &gt;
+</span><span>    </span><span style="color:#b48ead;">where
+</span><span>        </span><span style="color:#b48ead;">&#39;life0</span><span>: </span><span style="color:#b48ead;">&#39;async_trait</span><span>,
+</span><span>        </span><span style="color:#b48ead;">Self</span><span>: </span><span style="color:#b48ead;">&#39;async_trait</span><span>,
+</span><span>    {
+</span><span>        Box::pin(async </span><span style="color:#b48ead;">move </span><span>{
+</span><span>            </span><span style="color:#b48ead;">if let </span><span>::core::option::Option::Some(__ret) =
+</span><span>                ::core::option::Option::None::&lt;poem::Result&lt;</span><span style="color:#b48ead;">Self::</span><span>Output&gt;&gt;
+</span><span>            {
+</span><span>                </span><span style="color:#b48ead;">return</span><span> __ret;
+</span><span>            }
+</span><span>            </span><span style="color:#b48ead;">let</span><span> __self = </span><span style="color:#bf616a;">self</span><span>;
+</span><span>            </span><span style="color:#b48ead;">let mut</span><span> req = req;
+</span><span>            </span><span style="color:#b48ead;">let</span><span> __ret: poem::Result&lt;</span><span style="color:#b48ead;">Self::</span><span>Output&gt; = {
+</span><span>                </span><span style="color:#b48ead;">let </span><span>(req, </span><span style="color:#b48ead;">mut</span><span> body) = req.</span><span style="color:#96b5b4;">split</span><span>();
+</span><span>                </span><span style="color:#b48ead;">let</span><span> p0 = &lt;Path&lt;String&gt; as poem::FromRequest&gt;::from_request(&amp;req, &amp;</span><span style="color:#b48ead;">mut</span><span> body).await?;
+</span><span>                </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">hello</span><span>(Path(</span><span style="color:#bf616a;">name</span><span>): Path&lt;String&gt;) -&gt; String {
+</span><span>                    {
+</span><span>                        </span><span style="color:#b48ead;">let</span><span> res = ::alloc::fmt::format(::core::fmt::Arguments::new_v1(
+</span><span>                            &amp;[&quot;</span><span style="color:#a3be8c;">hello: </span><span>&quot;],
+</span><span>                            &amp;[::core::fmt::ArgumentV1::new_display(&amp;name)],
+</span><span>                        ));
+</span><span>                        res
+</span><span>                    }
+</span><span>                }
+</span><span>                </span><span style="color:#b48ead;">let</span><span> res = </span><span style="color:#96b5b4;">hello</span><span>(p0);
+</span><span>                </span><span style="color:#b48ead;">let</span><span> res = poem::error::IntoResult::into_result(res);
+</span><span>                std::result::Result::map(res, poem::IntoResponse::into_response)
+</span><span>            };
+</span><span>            #[</span><span style="color:#bf616a;">allow</span><span>(unreachable_code)]
+</span><span>            __ret
+</span><span>        })
+</span><span>    }
+</span><span>}
+</span></code></pre>
+
+    </div>
+
+    
+    
+
+    <div class="post-footer">
+        
+            
+                <div class="post-tags">
+                    
+                        <a href="https://harpsword.github.io/tags/rust/">#Rust</a>
+                    
+                </div>
+            
+            
+
+        
+
+    </div>
+
+    
+    
+</article>
+
+
+                </div>
+            </main>
+
+            
+            
+        </div>
+
+      
+          <script type="text/javascript" src="https://harpsword.github.io/even.js" ></script>
+      
+    </body>
+
+</html>

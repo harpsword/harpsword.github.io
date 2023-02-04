@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+      <!-- Enable responsiveness on mobile devices-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+      <title>yu&#x27;s blog - Source Reading: serde-partial</title>
+
+      
+
+      
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/slideout/1.0.1/slideout.min.js"></script>
+          
+      
+
+      
+          <link rel="stylesheet" href="https://harpsword.github.io/site.css">
+          
+      
+
+      
+      
+    </head>
+
+    <body>
+        <div class="container">
+
+            <div id="mobile-navbar" class="mobile-navbar">
+              <div class="mobile-header-logo">
+                <a href="/" class="logo">Yu 的天地</a>
+              </div>
+              <div class="mobile-navbar-icon icon-out">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+
+            <nav id="mobile-menu" class="mobile-menu slideout-menu slideout-menu-left">
+              <ul class="mobile-menu-list">
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                            Home
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                            Categories
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                            Tags
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                            About
+                        </a>
+                    </li>
+                
+              </ul>
+            </nav>
+
+            <header id="header">
+                <div class="logo"><a href="https:&#x2F;&#x2F;harpsword.github.io">Yu 的天地</a></div>
+                <nav class="menu">
+                    <ul>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                                    Home
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                                    Categories
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                                    Tags
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                                    About
+                                </a>
+                            </li>
+                        
+                    </ul>
+                </nav>
+            </header>
+
+            <main>
+                <div class="content" id="mobile-panel">
+                    
+
+
+<div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content always-active">
+        <nav id="TableOfContents">
+            <ul>
+                
+                <li>
+                    <a href="https://harpsword.github.io/source-reading-serde-partial/#mu-de" class="toc-link">目的</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/source-reading-serde-partial/#li-zi" class="toc-link">例子</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/source-reading-serde-partial/#si-lu" class="toc-link">思路</a>
+                    
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+<article class="post">
+    
+    <header class="post__header">
+        <h1 class="post__title">
+            <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;source-reading-serde-partial&#x2F;">Source Reading: serde-partial</a>
+        </h1>
+        <div class="post__meta">
+            <span class="post__time">2023-02-04</span>
+            
+        </div>
+    </header>
+
+    <div class="post-content">
+      <h1 id="mu-de">目的</h1>
+<p>使用serde的时候很方便的只对部分字段进行serialize。可行思路：</p>
+<ol>
+<li>利用 serde(skip_serializing_if = &quot;Option::is_none&quot;)的 field注解</li>
+<li>自定义实现Serializer接口
+以上两种方法都需要一定的烦人代码。</li>
+</ol>
+<h1 id="li-zi">例子</h1>
+<p>使用serde-partial库之后</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>#[</span><span style="color:#bf616a;">derive</span><span>(Serialize, SerializePartial)]
+</span><span>#[</span><span style="color:#bf616a;">serde</span><span>(rename_all = &quot;</span><span style="color:#a3be8c;">camelCase</span><span>&quot;)]
+</span><span style="color:#b48ead;">struct </span><span>User {
+</span><span>    </span><span style="color:#bf616a;">full_name</span><span>: &amp;</span><span style="color:#b48ead;">&#39;static str</span><span>,
+</span><span>    </span><span style="color:#bf616a;">age</span><span>: </span><span style="color:#b48ead;">u8</span><span>,
+</span><span>    #[</span><span style="color:#bf616a;">serde</span><span>(rename = &quot;</span><span style="color:#a3be8c;">contact</span><span>&quot;)]
+</span><span>    </span><span style="color:#bf616a;">email</span><span>: &amp;</span><span style="color:#b48ead;">&#39;static str</span><span>,
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">const </span><span style="color:#d08770;">USER</span><span>: User = User {
+</span><span>    full_name: &quot;</span><span style="color:#a3be8c;">John Doe</span><span>&quot;,
+</span><span>    age: </span><span style="color:#d08770;">42</span><span>,
+</span><span>    email: &quot;</span><span style="color:#a3be8c;">john.doe@example.com</span><span>&quot;,
+</span><span>};
+</span><span>
+</span><span style="color:#65737e;">// serialize only the `full_name` field
+</span><span style="color:#b48ead;">let</span><span> filtered = </span><span style="color:#d08770;">USER</span><span>.</span><span style="color:#96b5b4;">with_fields</span><span>(|</span><span style="color:#bf616a;">u</span><span>| [u.full_name]);
+</span><span style="color:#b48ead;">let</span><span> json = serde_json::to_value(&amp;filtered).</span><span style="color:#96b5b4;">unwrap</span><span>();
+</span><span>assert_eq!(
+</span><span>    json,
+</span><span>    serde_json::json!({
+</span><span>        &quot;</span><span style="color:#a3be8c;">fullName</span><span>&quot;: </span><span style="color:#d08770;">USER</span><span>.full_name,
+</span><span>    })
+</span><span>);
+</span></code></pre>
+<h1 id="si-lu">思路</h1>
+<p>采用了自定义实现Serializer的思路，将重复代码采用过程宏的方式进行省略，如下所示：</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>#[</span><span style="color:#bf616a;">derive</span><span>(Serialize, SerializePartial)]
+</span><span>#[</span><span style="color:#bf616a;">serde</span><span>(rename_all = &quot;</span><span style="color:#a3be8c;">camelCase</span><span>&quot;)]
+</span><span style="color:#b48ead;">struct </span><span>User {
+</span><span>    </span><span style="color:#bf616a;">full_name</span><span>: &amp;</span><span style="color:#b48ead;">&#39;static str</span><span>,
+</span><span>    </span><span style="color:#bf616a;">age</span><span>: </span><span style="color:#b48ead;">u8</span><span>,
+</span><span>    #[</span><span style="color:#bf616a;">serde</span><span>(rename = &quot;</span><span style="color:#a3be8c;">contact</span><span>&quot;)]
+</span><span>    </span><span style="color:#bf616a;">email</span><span>: &amp;</span><span style="color:#b48ead;">&#39;static str</span><span>,
+</span><span>}
+</span></code></pre>
+<p>其中的SerializePartial expand之后生成了如下代码，Partial结构实现了Serializer方法。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#65737e;">// Recursive expansion of SerializePartial! macro
+</span><span style="color:#65737e;">// ===============================================
+</span><span>
+</span><span>#[</span><span style="color:#bf616a;">doc</span><span>(hidden)]
+</span><span>#[</span><span style="color:#bf616a;">allow</span><span>(non_upper_case_globals, non_camel_case_types)]
+</span><span style="color:#b48ead;">const </span><span>_: () = {
+</span><span>    #[</span><span style="color:#bf616a;">derive</span><span>(Debug, Clone, Copy)]
+</span><span>    </span><span style="color:#b48ead;">struct </span><span>UserFields {
+</span><span>        </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">full_name</span><span>: ::serde_partial::Field&lt;</span><span style="color:#b48ead;">&#39;static</span><span>, User&gt;,
+</span><span>        </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">age</span><span>: ::serde_partial::Field&lt;</span><span style="color:#b48ead;">&#39;static</span><span>, User&gt;,
+</span><span>        </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">email</span><span>: ::serde_partial::Field&lt;</span><span style="color:#b48ead;">&#39;static</span><span>, User&gt;,
+</span><span>    }
+</span><span>    </span><span style="color:#b48ead;">impl </span><span>UserFields {
+</span><span>        </span><span style="color:#b48ead;">pub const </span><span style="color:#d08770;">FIELDS</span><span>: </span><span style="color:#b48ead;">Self </span><span>= </span><span style="color:#b48ead;">Self </span><span>{
+</span><span>            full_name: ::serde_partial::Field::new(&quot;</span><span style="color:#a3be8c;">fullName</span><span>&quot;),
+</span><span>            age: ::serde_partial::Field::new(&quot;</span><span style="color:#a3be8c;">age</span><span>&quot;),
+</span><span>            email: ::serde_partial::Field::new(&quot;</span><span style="color:#a3be8c;">contact</span><span>&quot;),
+</span><span>        };
+</span><span>    }
+</span><span>    </span><span style="color:#b48ead;">impl </span><span>::core::iter::IntoIterator </span><span style="color:#b48ead;">for </span><span>UserFields {
+</span><span>        </span><span style="color:#b48ead;">type </span><span>Item = ::serde_partial::Field&lt;</span><span style="color:#b48ead;">&#39;static</span><span>, User&gt;;
+</span><span>        </span><span style="color:#b48ead;">type </span><span>IntoIter = ::core::array::IntoIter&lt;</span><span style="color:#b48ead;">Self::</span><span>Item, 3usize&gt;;
+</span><span>        </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">into_iter</span><span>(</span><span style="color:#bf616a;">self</span><span>) -&gt; </span><span style="color:#b48ead;">Self::</span><span>IntoIter {
+</span><span>            #[</span><span style="color:#bf616a;">allow</span><span>(deprecated)]
+</span><span>            ::core::array::IntoIter::new([</span><span style="color:#bf616a;">self</span><span>.full_name, </span><span style="color:#bf616a;">self</span><span>.age, </span><span style="color:#bf616a;">self</span><span>.email])
+</span><span>        }
+</span><span>    }
+</span><span>    #[</span><span style="color:#bf616a;">derive</span><span>(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span>    </span><span style="color:#b48ead;">struct </span><span>UserFilter {
+</span><span>        </span><span style="color:#bf616a;">full_name</span><span>: </span><span style="color:#b48ead;">bool</span><span>,
+</span><span>        </span><span style="color:#bf616a;">age</span><span>: </span><span style="color:#b48ead;">bool</span><span>,
+</span><span>        </span><span style="color:#bf616a;">email</span><span>: </span><span style="color:#b48ead;">bool</span><span>,
+</span><span>    }
+</span><span>    </span><span style="color:#b48ead;">impl </span><span>::serde_partial::SerializeFilter&lt;User&gt; </span><span style="color:#b48ead;">for </span><span>UserFilter {
+</span><span>        </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">skip</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">field</span><span>: ::serde_partial::Field&lt;&#39;_, User&gt;) -&gt; </span><span style="color:#b48ead;">bool </span><span>{
+</span><span>            </span><span style="color:#b48ead;">match</span><span> field.</span><span style="color:#96b5b4;">name</span><span>() {
+</span><span>                &quot;</span><span style="color:#a3be8c;">fullName</span><span>&quot; =&gt; !</span><span style="color:#bf616a;">self</span><span>.full_name,
+</span><span>                &quot;</span><span style="color:#a3be8c;">age</span><span>&quot; =&gt; !</span><span style="color:#bf616a;">self</span><span>.age,
+</span><span>                &quot;</span><span style="color:#a3be8c;">contact</span><span>&quot; =&gt; !</span><span style="color:#bf616a;">self</span><span>.email,
+</span><span>                _ =&gt; panic!(&quot;</span><span style="color:#a3be8c;">unknown field</span><span>&quot;),
+</span><span>            }
+</span><span>        }
+</span><span>        </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">filtered_len</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">_len</span><span>: Option&lt;</span><span style="color:#b48ead;">usize</span><span>&gt;) -&gt; Option&lt;</span><span style="color:#b48ead;">usize</span><span>&gt; {
+</span><span>            </span><span style="color:#b48ead;">let mut</span><span> len = </span><span style="color:#d08770;">0</span><span>;
+</span><span>            </span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">self</span><span>.full_name {
+</span><span>                len += </span><span style="color:#d08770;">1</span><span>;
+</span><span>            }
+</span><span>            </span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">self</span><span>.age {
+</span><span>                len += </span><span style="color:#d08770;">1</span><span>;
+</span><span>            }
+</span><span>            </span><span style="color:#b48ead;">if </span><span style="color:#bf616a;">self</span><span>.email {
+</span><span>                len += </span><span style="color:#d08770;">1</span><span>;
+</span><span>            }
+</span><span>            Some(len)
+</span><span>        }
+</span><span>    }
+</span><span>    </span><span style="color:#b48ead;">impl</span><span>&lt;</span><span style="color:#b48ead;">&#39;a</span><span>&gt; ::serde_partial::SerializePartial&lt;</span><span style="color:#b48ead;">&#39;a</span><span>&gt; </span><span style="color:#b48ead;">for </span><span>User {
+</span><span>        </span><span style="color:#b48ead;">type </span><span>Fields = UserFields;
+</span><span>        </span><span style="color:#b48ead;">type </span><span>Filter = UserFilter;
+</span><span>        </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">with_fields</span><span>&lt;F, I&gt;(&amp;</span><span style="color:#b48ead;">&#39;a </span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">select</span><span>: F) -&gt; ::serde_partial::Partial&lt;</span><span style="color:#b48ead;">&#39;a</span><span>, </span><span style="color:#b48ead;">Self</span><span>&gt;
+</span><span>        </span><span style="color:#b48ead;">where
+</span><span>            F: ::core::ops::FnOnce(</span><span style="color:#b48ead;">Self::</span><span>Fields) -&gt; I,
+</span><span>            I: ::core::iter::IntoIterator&lt;Item = ::serde_partial::Field&lt;</span><span style="color:#b48ead;">&#39;a</span><span>, </span><span style="color:#b48ead;">Self</span><span>&gt;&gt;,
+</span><span>        {
+</span><span>            </span><span style="color:#b48ead;">let</span><span> fields = </span><span style="color:#b48ead;">Self</span><span>::Fields::</span><span style="color:#d08770;">FIELDS</span><span>;
+</span><span>            </span><span style="color:#b48ead;">let mut</span><span> filter = &lt;</span><span style="color:#b48ead;">Self::</span><span>Filter as ::core::default::Default&gt;::default();
+</span><span>            </span><span style="color:#b48ead;">for</span><span> filtered in </span><span style="color:#96b5b4;">select</span><span>(fields) {
+</span><span>                </span><span style="color:#b48ead;">match</span><span> filtered.</span><span style="color:#96b5b4;">name</span><span>() {
+</span><span>                    &quot;</span><span style="color:#a3be8c;">fullName</span><span>&quot; =&gt; filter.full_name = </span><span style="color:#d08770;">true</span><span>,
+</span><span>                    &quot;</span><span style="color:#a3be8c;">age</span><span>&quot; =&gt; filter.age = </span><span style="color:#d08770;">true</span><span>,
+</span><span>                    &quot;</span><span style="color:#a3be8c;">contact</span><span>&quot; =&gt; filter.email = </span><span style="color:#d08770;">true</span><span>,
+</span><span>                    _ =&gt; panic!(&quot;</span><span style="color:#a3be8c;">unknown field</span><span>&quot;),
+</span><span>                }
+</span><span>            }
+</span><span>            ::serde_partial::Partial {
+</span><span>                value: </span><span style="color:#bf616a;">self</span><span>,
+</span><span>                filter,
+</span><span>            }
+</span><span>        }
+</span><span>    }
+</span><span>};
+</span></code></pre>
+
+    </div>
+
+    
+    
+
+    <div class="post-footer">
+        
+            
+                <div class="post-tags">
+                    
+                        <a href="https://harpsword.github.io/tags/rust/">#Rust</a>
+                    
+                </div>
+            
+            
+
+        
+
+    </div>
+
+    
+    
+</article>
+
+
+                </div>
+            </main>
+
+            
+            
+        </div>
+
+      
+          <script type="text/javascript" src="https://harpsword.github.io/even.js" ></script>
+      
+    </body>
+
+</html>

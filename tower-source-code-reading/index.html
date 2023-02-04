@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+      <!-- Enable responsiveness on mobile devices-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+      <title>yu&#x27;s blog - tower源码阅读</title>
+
+      
+
+      
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/slideout/1.0.1/slideout.min.js"></script>
+          
+      
+
+      
+          <link rel="stylesheet" href="https://harpsword.github.io/site.css">
+          
+      
+
+      
+      
+    </head>
+
+    <body>
+        <div class="container">
+
+            <div id="mobile-navbar" class="mobile-navbar">
+              <div class="mobile-header-logo">
+                <a href="/" class="logo">Yu 的天地</a>
+              </div>
+              <div class="mobile-navbar-icon icon-out">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+
+            <nav id="mobile-menu" class="mobile-menu slideout-menu slideout-menu-left">
+              <ul class="mobile-menu-list">
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                            Home
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                            Categories
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                            Tags
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                            About
+                        </a>
+                    </li>
+                
+              </ul>
+            </nav>
+
+            <header id="header">
+                <div class="logo"><a href="https:&#x2F;&#x2F;harpsword.github.io">Yu 的天地</a></div>
+                <nav class="menu">
+                    <ul>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                                    Home
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                                    Categories
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                                    Tags
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                                    About
+                                </a>
+                            </li>
+                        
+                    </ul>
+                </nav>
+            </header>
+
+            <main>
+                <div class="content" id="mobile-panel">
+                    
+
+
+<div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content always-active">
+        <nav id="TableOfContents">
+            <ul>
+                
+                <li>
+                    <a href="https://harpsword.github.io/tower-source-code-reading/#he-xin-trait" class="toc-link">核心Trait</a>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/tower-source-code-reading/#service" class="toc-link">Service</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/tower-source-code-reading/#layer" class="toc-link">Layer</a>
+                        </li>
+                        
+                    </ul>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/tower-source-code-reading/#shi-xian-de-yi-xie-zhong-jian-jian" class="toc-link">实现的一些中间件</a>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/tower-source-code-reading/#timeout" class="toc-link">Timeout</a>
+                        </li>
+                        
+                    </ul>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/tower-source-code-reading/#si-kao" class="toc-link">思考</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/tower-source-code-reading/#ref" class="toc-link">Ref</a>
+                    
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+<article class="post">
+    
+    <header class="post__header">
+        <h1 class="post__title">
+            <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tower-source-code-reading&#x2F;">tower源码阅读</a>
+        </h1>
+        <div class="post__meta">
+            <span class="post__time">2022-08-13</span>
+            
+        </div>
+    </header>
+
+    <div class="post-content">
+      <h1 id="he-xin-trait">核心Trait</h1>
+<h2 id="service">Service</h2>
+<p>核心Trait定义如下所示，Response采样关联类型是因为一个Request和一个Service实现应该对应一个Response。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub trait </span><span>Service&lt;Request&gt; {
+</span><span>    </span><span style="color:#65737e;">/// Responses given by the service.
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Response;
+</span><span>
+</span><span>    </span><span style="color:#65737e;">/// Errors produced by the service.
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Error;
+</span><span>
+</span><span>    </span><span style="color:#65737e;">/// The future response value.
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Future: Future&lt;Output = Result&lt;</span><span style="color:#b48ead;">Self::</span><span>Response, </span><span style="color:#b48ead;">Self::</span><span>Error&gt;&gt;;
+</span><span>
+</span><span>    </span><span style="color:#65737e;">/// Returns `Poll::Ready(Ok(()))` when the service is able to process requests.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// If the service is at capacity, then `Poll::Pending` is returned and the task
+</span><span>    </span><span style="color:#65737e;">/// is notified when the service becomes ready again. This function is
+</span><span>    </span><span style="color:#65737e;">/// expected to be called while on a task. Generally, this can be done with
+</span><span>    </span><span style="color:#65737e;">/// a simple `futures::future::poll_fn` call.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// If `Poll::Ready(Err(_))` is returned, the service is no longer able to service requests
+</span><span>    </span><span style="color:#65737e;">/// and the caller should discard the service instance.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// Once `poll_ready` returns `Poll::Ready(Ok(()))`, a request may be dispatched to the
+</span><span>    </span><span style="color:#65737e;">/// service using `call`. Until a request is dispatched, repeated calls to
+</span><span>    </span><span style="color:#65737e;">/// `poll_ready` must return either `Poll::Ready(Ok(()))` or `Poll::Ready(Err(_))`.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// Note that `poll_ready` may reserve shared resources that are consumed in a subsequent
+</span><span>    </span><span style="color:#65737e;">/// invocation of `call`. Thus, it is critical for implementations to not assume that `call`
+</span><span>    </span><span style="color:#65737e;">/// will always be invoked to ensure that such resources are released if the service is
+</span><span>    </span><span style="color:#65737e;">/// dropped before `call` is invoked or the future returned by `call` is dropped before it
+</span><span>    </span><span style="color:#65737e;">/// is polled.
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">poll_ready</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">cx</span><span>: &amp;</span><span style="color:#b48ead;">mut </span><span>Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), </span><span style="color:#b48ead;">Self::</span><span>Error&gt;&gt;;
+</span><span>
+</span><span>    </span><span style="color:#65737e;">/// Process the request and return the response asynchronously.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// This function is expected to be callable off task. As such,
+</span><span>    </span><span style="color:#65737e;">/// implementations should take care to not call `poll_ready`.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// Before dispatching a request, `poll_ready` must be called and return
+</span><span>    </span><span style="color:#65737e;">/// `Poll::Ready(Ok(()))`.
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// # Panics
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// Implementations are permitted to panic if `call` is invoked without
+</span><span>    </span><span style="color:#65737e;">/// obtaining `Poll::Ready(Ok(()))` from `poll_ready`.
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">call</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">req</span><span>: Request) -&gt; </span><span style="color:#b48ead;">Self::</span><span>Future;
+</span><span>}
+</span><span>
+</span></code></pre>
+<p>默认实现：</p>
+<ol>
+<li>针对独占引用(原类型S实现了Service)实现了Service</li>
+<li>针对<code>Box&lt;S&gt;</code>(原类型S实现了Service)实现了Service
+这两个默认实现可以方便使用。</li>
+</ol>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">impl</span><span>&lt;</span><span style="color:#b48ead;">&#39;a</span><span>, S, Request&gt; Service&lt;Request&gt; </span><span style="color:#b48ead;">for </span><span>&amp;</span><span style="color:#b48ead;">&#39;a </span><span>mut S
+</span><span style="color:#b48ead;">where
+</span><span>    S: Service&lt;Request&gt; + </span><span style="color:#b48ead;">&#39;a</span><span>,
+</span><span>{
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Response = S::Response;
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Error = S::Error;
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Future = S::Future;
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">poll_ready</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">cx</span><span>: &amp;</span><span style="color:#b48ead;">mut </span><span>Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), </span><span style="color:#b48ead;">S::</span><span>Error&gt;&gt; {
+</span><span>        (**</span><span style="color:#bf616a;">self</span><span>).</span><span style="color:#96b5b4;">poll_ready</span><span>(cx)
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">call</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">request</span><span>: Request) -&gt; </span><span style="color:#b48ead;">S::</span><span>Future {
+</span><span>        (**</span><span style="color:#bf616a;">self</span><span>).</span><span style="color:#96b5b4;">call</span><span>(request)
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl</span><span>&lt;S, Request&gt; Service&lt;Request&gt; </span><span style="color:#b48ead;">for </span><span>Box&lt;S&gt;
+</span><span style="color:#b48ead;">where
+</span><span>    S: Service&lt;Request&gt; + ?Sized,
+</span><span>{
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Response = S::Response;
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Error = S::Error;
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Future = S::Future;
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">poll_ready</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">cx</span><span>: &amp;</span><span style="color:#b48ead;">mut </span><span>Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), </span><span style="color:#b48ead;">S::</span><span>Error&gt;&gt; {
+</span><span>        (**</span><span style="color:#bf616a;">self</span><span>).</span><span style="color:#96b5b4;">poll_ready</span><span>(cx)
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">call</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">request</span><span>: Request) -&gt; </span><span style="color:#b48ead;">S::</span><span>Future {
+</span><span>        (**</span><span style="color:#bf616a;">self</span><span>).</span><span style="color:#96b5b4;">call</span><span>(request)
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h2 id="layer">Layer</h2>
+<p>输入是一个Service，输出也是一个Service。目的是为了方便做不同组件之间的套娃。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub trait </span><span>Layer&lt;S&gt; {
+</span><span>    </span><span style="color:#65737e;">/// The wrapped service
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Service;
+</span><span>    </span><span style="color:#65737e;">/// Wrap the given service with the middleware, returning a new service
+</span><span>    </span><span style="color:#65737e;">/// that has been decorated with the middleware.
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">layer</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">inner</span><span>: S) -&gt; </span><span style="color:#b48ead;">Self::</span><span>Service;
+</span><span>}
+</span></code></pre>
+<p>默认实现，给共享引用实现了Layer(原变量实现了Layer)，和Service类似。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">impl</span><span>&lt;</span><span style="color:#b48ead;">&#39;a</span><span>, T, S&gt; Layer&lt;S&gt; </span><span style="color:#b48ead;">for </span><span>&amp;</span><span style="color:#b48ead;">&#39;a </span><span>T
+</span><span style="color:#b48ead;">where
+</span><span>    T: ?Sized + Layer&lt;S&gt;,
+</span><span>{
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Service = T::Service;
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">layer</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">inner</span><span>: S) -&gt; </span><span style="color:#b48ead;">Self::</span><span>Service {
+</span><span>        (**</span><span style="color:#bf616a;">self</span><span>).</span><span style="color:#96b5b4;">layer</span><span>(inner)
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h1 id="shi-xian-de-yi-xie-zhong-jian-jian">实现的一些中间件</h1>
+<h2 id="timeout">Timeout</h2>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>#[</span><span style="color:#bf616a;">derive</span><span>(Debug, Clone)]
+</span><span style="color:#b48ead;">pub struct </span><span>Timeout&lt;T&gt; {
+</span><span>    </span><span style="color:#bf616a;">inner</span><span>: T,
+</span><span>    </span><span style="color:#bf616a;">timeout</span><span>: Duration,
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl</span><span>&lt;S, Request&gt; Service&lt;Request&gt; </span><span style="color:#b48ead;">for </span><span>Timeout&lt;S&gt;
+</span><span style="color:#b48ead;">where
+</span><span>    S: Service&lt;Request&gt;,
+</span><span>    </span><span style="color:#b48ead;">S::</span><span>Error: Into&lt;crate::BoxError&gt;,
+</span><span>{
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Response = S::Response;
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Error = </span><span style="color:#b48ead;">crate</span><span>::BoxError;
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Future = ResponseFuture&lt;</span><span style="color:#b48ead;">S::</span><span>Future&gt;;
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">poll_ready</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">cx</span><span>: &amp;</span><span style="color:#b48ead;">mut </span><span>Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), </span><span style="color:#b48ead;">Self::</span><span>Error&gt;&gt; {
+</span><span>        </span><span style="color:#b48ead;">match </span><span style="color:#bf616a;">self</span><span>.inner.</span><span style="color:#96b5b4;">poll_ready</span><span>(cx) {
+</span><span>            Poll::Pending =&gt; Poll::Pending,
+</span><span>            Poll::Ready(r) =&gt; Poll::Ready(r.</span><span style="color:#96b5b4;">map_err</span><span>(Into::into)),
+</span><span>        }
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">call</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">request</span><span>: Request) -&gt; </span><span style="color:#b48ead;">Self::</span><span>Future {
+</span><span>        </span><span style="color:#b48ead;">let</span><span> response = </span><span style="color:#bf616a;">self</span><span>.inner.</span><span style="color:#96b5b4;">call</span><span>(request);
+</span><span>        </span><span style="color:#b48ead;">let</span><span> sleep = tokio::time::sleep(</span><span style="color:#bf616a;">self</span><span>.timeout);
+</span><span>
+</span><span>        ResponseFuture::new(response, sleep)
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<p>实现过程中对于Self::Future采用了ResponseFuture struct来实现。在为ResponseFuture实现Future trait的过程中，需要Pin住<code>this.response, this.sleep</code>才能调用对应的poll方法，采用<code>pin_project</code>来实现。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>pin_project! {
+</span><span>    </span><span style="color:#65737e;">/// [`Timeout`] response future
+</span><span>    </span><span style="color:#65737e;">///
+</span><span>    </span><span style="color:#65737e;">/// [`Timeout`]: crate::timeout::Timeout
+</span><span>    #[</span><span style="color:#bf616a;">derive</span><span>(Debug)]
+</span><span>    </span><span style="color:#b48ead;">pub struct </span><span>ResponseFuture&lt;T&gt; {
+</span><span>        #[</span><span style="color:#bf616a;">pin</span><span>]
+</span><span>        </span><span style="color:#bf616a;">response</span><span>: T,
+</span><span>        #[</span><span style="color:#bf616a;">pin</span><span>]
+</span><span>        </span><span style="color:#bf616a;">sleep</span><span>: Sleep,
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl</span><span>&lt;T&gt; ResponseFuture&lt;T&gt; {
+</span><span>    </span><span style="color:#b48ead;">pub</span><span>(</span><span style="color:#b48ead;">crate</span><span>) </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">new</span><span>(</span><span style="color:#bf616a;">response</span><span>: T, </span><span style="color:#bf616a;">sleep</span><span>: Sleep) -&gt; </span><span style="color:#b48ead;">Self </span><span>{
+</span><span>        ResponseFuture { response, sleep }
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl</span><span>&lt;F, T, E&gt; Future </span><span style="color:#b48ead;">for </span><span>ResponseFuture&lt;F&gt;
+</span><span style="color:#b48ead;">where
+</span><span>    F: Future&lt;Output = Result&lt;T, E&gt;&gt;,
+</span><span>    E: Into&lt;crate::BoxError&gt;,
+</span><span>{
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Output = Result&lt;T, crate::BoxError&gt;;
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">poll</span><span>(</span><span style="color:#bf616a;">self</span><span>: Pin&lt;&amp;</span><span style="color:#b48ead;">mut Self</span><span>&gt;, </span><span style="color:#bf616a;">cx</span><span>: &amp;</span><span style="color:#b48ead;">mut </span><span>Context&lt;&#39;_&gt;) -&gt; Poll&lt;</span><span style="color:#b48ead;">Self::</span><span>Output&gt; {
+</span><span>        </span><span style="color:#b48ead;">let</span><span> this = </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">project</span><span>();
+</span><span>
+</span><span>        </span><span style="color:#65737e;">// First, try polling the future
+</span><span>        </span><span style="color:#65737e;">// require this.response be Pin!
+</span><span>        </span><span style="color:#b48ead;">match</span><span> this.response.</span><span style="color:#96b5b4;">poll</span><span>(cx) {
+</span><span>            Poll::Ready(v) =&gt; </span><span style="color:#b48ead;">return </span><span>Poll::Ready(v.</span><span style="color:#96b5b4;">map_err</span><span>(Into::into)),
+</span><span>            Poll::Pending =&gt; {}
+</span><span>        }
+</span><span>
+</span><span>        </span><span style="color:#65737e;">// Now check the sleep
+</span><span>        </span><span style="color:#65737e;">// require this.sleep be Pin!
+</span><span>        </span><span style="color:#b48ead;">match</span><span> this.sleep.</span><span style="color:#96b5b4;">poll</span><span>(cx) {
+</span><span>            Poll::Pending =&gt; Poll::Pending,
+</span><span>            Poll::Ready(_) =&gt; Poll::Ready(Err(Elapsed(()).</span><span style="color:#96b5b4;">into</span><span>())),
+</span><span>        }
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h3 id="layer-1">Layer</h3>
+<p>为中间件实现了Layer trait，方便叠加。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>#[</span><span style="color:#bf616a;">derive</span><span>(Debug, Clone)]
+</span><span style="color:#b48ead;">pub struct </span><span>TimeoutLayer {
+</span><span>    </span><span style="color:#bf616a;">timeout</span><span>: Duration,
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl </span><span>TimeoutLayer {
+</span><span>    </span><span style="color:#65737e;">/// Create a timeout from a duration
+</span><span>    </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">new</span><span>(</span><span style="color:#bf616a;">timeout</span><span>: Duration) -&gt; </span><span style="color:#b48ead;">Self </span><span>{
+</span><span>        TimeoutLayer { timeout }
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl</span><span>&lt;S&gt; Layer&lt;S&gt; </span><span style="color:#b48ead;">for </span><span>TimeoutLayer {
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Service = Timeout&lt;S&gt;;
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">layer</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">service</span><span>: S) -&gt; </span><span style="color:#b48ead;">Self::</span><span>Service {
+</span><span>        Timeout::new(service, </span><span style="color:#bf616a;">self</span><span>.timeout)
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h1 id="si-kao">思考</h1>
+<p>poem的整体设计和tower很像，应该进行了一定的参考。比如poem中的Endpoint和tower的Service trait很像，都是对一次请求处理的抽象，只不过Endpoint定位具体的场景，Request和Response采用了具体的结构体，而非关联对象或者泛型。</p>
+<p>poem中的Middleware和tower中的Layer也很像。Middleware trait实现的方法输入和输出都是Endpoint trait object，可以实现Endpoint之间的连接。Layer trait实现的方法输入和输出没有强制限制都是Service triat object，但是可以用于这种场景。</p>
+<h1 id="ref">Ref</h1>
+<ol>
+<li>https://tokio.rs/blog/2021-05-14-inventing-the-service-trait#footnotes</li>
+<li></li>
+</ol>
+
+    </div>
+
+    
+    
+
+    <div class="post-footer">
+        
+            
+                <div class="post-tags">
+                    
+                        <a href="https://harpsword.github.io/tags/rust/">#Rust</a>
+                    
+                </div>
+            
+            
+
+        
+
+    </div>
+
+    
+    
+</article>
+
+
+                </div>
+            </main>
+
+            
+            
+        </div>
+
+      
+          <script type="text/javascript" src="https://harpsword.github.io/even.js" ></script>
+      
+    </body>
+
+</html>

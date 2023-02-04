@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+      <!-- Enable responsiveness on mobile devices-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+      <title>yu&#x27;s blog - Rust 转换</title>
+
+      
+
+      
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/slideout/1.0.1/slideout.min.js"></script>
+          
+      
+
+      
+          <link rel="stylesheet" href="https://harpsword.github.io/site.css">
+          
+      
+
+      
+      
+    </head>
+
+    <body>
+        <div class="container">
+
+            <div id="mobile-navbar" class="mobile-navbar">
+              <div class="mobile-header-logo">
+                <a href="/" class="logo">Yu 的天地</a>
+              </div>
+              <div class="mobile-navbar-icon icon-out">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+
+            <nav id="mobile-menu" class="mobile-menu slideout-menu slideout-menu-left">
+              <ul class="mobile-menu-list">
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                            Home
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                            Categories
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                            Tags
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                            About
+                        </a>
+                    </li>
+                
+              </ul>
+            </nav>
+
+            <header id="header">
+                <div class="logo"><a href="https:&#x2F;&#x2F;harpsword.github.io">Yu 的天地</a></div>
+                <nav class="menu">
+                    <ul>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                                    Home
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                                    Categories
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                                    Tags
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                                    About
+                                </a>
+                            </li>
+                        
+                    </ul>
+                </nav>
+            </header>
+
+            <main>
+                <div class="content" id="mobile-panel">
+                    
+
+
+<div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content always-active">
+        <nav id="TableOfContents">
+            <ul>
+                
+                <li>
+                    <a href="https://harpsword.github.io/rust-coercion/#rust-zhong-de-zhuan-huan" class="toc-link">Rust 中的转换</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/rust-coercion/#zhuan-huan-trait" class="toc-link">转换Trait</a>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/rust-coercion/#deref-and-derefmut" class="toc-link">Deref and DerefMut</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/rust-coercion/#asref-and-asmut" class="toc-link">AsRef and AsMut</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/rust-coercion/#borrow-and-borrowmut" class="toc-link">Borrow and BorrowMut</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/rust-coercion/#from-and-into" class="toc-link">From and Into</a>
+                        </li>
+                        
+                    </ul>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/rust-coercion/#zi-dong-qiang-zhi-zhuan-huan" class="toc-link">自动强制转换</a>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/rust-coercion/#yin-yong-jiang-ji-qiang-zhuan" class="toc-link">引用降级强转</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/rust-coercion/#deref-coercion" class="toc-link">Deref Coercion</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/rust-coercion/#unsized-coercion" class="toc-link">Unsized Coercion</a>
+                        </li>
+                        
+                    </ul>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/rust-coercion/#zhu-dong-zhuan-huan" class="toc-link">主动转换</a>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/rust-coercion/#from" class="toc-link">From</a>
+                        </li>
+                        
+                    </ul>
+                    
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+<article class="post">
+    
+    <header class="post__header">
+        <h1 class="post__title">
+            <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;rust-coercion&#x2F;">Rust 转换</a>
+        </h1>
+        <div class="post__meta">
+            <span class="post__time">2022-07-24</span>
+            
+        </div>
+    </header>
+
+    <div class="post-content">
+      <h1 id="rust-zhong-de-zhuan-huan">Rust 中的转换</h1>
+<p>涉及的内容有以下四类trait</p>
+<ol>
+<li>Deref/DerefMut</li>
+<li>AsRef/AsMut</li>
+<li>Borrow/BorrowMut</li>
+<li>From</li>
+</ol>
+<p>还有自动转换与主动转换。</p>
+<h1 id="zhuan-huan-trait">转换Trait</h1>
+<h2 id="deref-and-derefmut">Deref and DerefMut</h2>
+<p>trait定义如下所示，<code>?Sized</code>基本表示了所有的类型。deref函数只要求共享引用，生成的结果也是一个共享引用，并不会消耗所有权。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub trait </span><span>Deref {
+</span><span>    </span><span style="color:#b48ead;">type </span><span>Target: ?Sized;
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">deref</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>) -&gt; &amp;</span><span style="color:#b48ead;">Self::</span><span>Target;
+</span><span>}
+</span></code></pre>
+<p>DerefMut的定义如下所示，实现DerefMut要求先实现Deref trait，针对的Target和Deref trait中的一样；只是多了一个方法deref_mut，入参和出参都是独占引用。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub trait </span><span>DerefMut: Deref {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">deref_mut</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>) -&gt; &amp;</span><span style="color:#b48ead;">mut Self::</span><span>Target;
+</span><span>}
+</span></code></pre>
+<p>从triat定义的位置来看，这两个trait都在<code>std::ops</code>下，ops包的定位是可重载的操作符，这两个trait在语法中有一定用处，具体内容会在自动转换一节来介绍。</p>
+<p>这是ops包的doc引用。</p>
+<blockquote>
+<p>Overloadable operators.</p>
+<p>Implementing these traits allows you to overload certain operators.</p>
+</blockquote>
+<h2 id="asref-and-asmut">AsRef and AsMut</h2>
+<p>AsRef 定义如下所示，as_ref函数的目的是把<code>&amp;self</code>转换为<code>&amp;T</code>，<strong>定位是一个廉价的共享引用-共享引用转换函数</strong>。这个trait的定义和前面的Deref不同，采用了泛型T来表示转换的目标类型；Deref采用关联类型来表示目标类型，对于一个类型，只能定义一个关联类型，而泛型可以定义多个。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#65737e;">// std::convert::AsRef
+</span><span style="color:#b48ead;">pub trait </span><span>AsRef&lt;T&gt; 
+</span><span>where    
+</span><span>	T: ?Sized, 
+</span><span>{
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">as_ref</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>) -&gt; &amp;T;
+</span><span>}
+</span></code></pre>
+<blockquote>
+<p>⚠️ inner type是reference或者mutable reference都行。对于这种情况，AsRef会进行自动解引用。</p>
+</blockquote>
+<p>AsMut的trait定义，和AsRef很接近，<strong>定位是一个廉价的独占引用-独占引用转换函数。</strong></p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub trait </span><span>AsMut&lt;T&gt; 
+</span><span>where    
+</span><span>	T: ?Sized, 
+</span><span>{
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">as_mut</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>) -&gt; &amp;</span><span style="color:#b48ead;">mut</span><span> T;
+</span><span>}
+</span></code></pre>
+<p>AsRef和AsMut都在包<code>std::convert</code>下，这个包的定位是一个转换trait。</p>
+<blockquote>
+<p>Traits for conversions between types.</p>
+</blockquote>
+<h2 id="borrow-and-borrowmut">Borrow and BorrowMut</h2>
+<p>trait定义如下所示，这个trait用于实现借用数据。在某些情况下，Owner和Borrower的数据是不同的。比如String类型，对于Owner，这是一个可变的字符串，肯定是字符串之外的数据字段来实现可变；但是对于Borrower，只需要借用不可变字符串数据即可(&amp;str)。
+另外Borrow要求，<strong>借用后的类型和原类型满足<code>Eq</code>,<code>Ord</code>,<code>Hash</code> trait是等价的。</strong></p>
+<p>Borrow trait针对的是共享借用。BorrowMut trait针对的是独占借用。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#65737e;">// std::borrow::Borrow
+</span><span style="color:#b48ead;">pub trait </span><span>Borrow&lt;Borrowed&gt; 
+</span><span>where    
+</span><span>	Borrowed: ?Sized, 
+</span><span>{
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">borrow</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>) -&gt; &amp;Borrowed;
+</span><span>}
+</span></code></pre>
+<p>Borrow trait在<code>std::borrow</code>包中，该包的定位：</p>
+<blockquote>
+<p>A module for working with borrowed data.</p>
+</blockquote>
+<h2 id="from-and-into">From and Into</h2>
+<p>trait定义如下所示，可以看到这两个trait都会消耗入参的所有权，实现value owner-&gt; value owner的转换。From和Into互为相反方法。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub trait </span><span>From&lt;T&gt; {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">from</span><span>(T) -&gt; </span><span style="color:#b48ead;">Self</span><span>;
+</span><span>}
+</span><span style="color:#b48ead;">pub trait </span><span>Into&lt;T&gt; {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">into</span><span>(</span><span style="color:#bf616a;">self</span><span>) -&gt; T;
+</span><span>}
+</span></code></pre>
+<p>对类型B实现<code>From&lt;A&gt;</code>之后，标准库中会提供一个默认实现<code>Into&lt;B&gt;</code> for A。所以一般只需要实现From trait即可。
+在trait bound中一般采用<code>Into&lt;T&gt;</code>来限定类型。</p>
+<h1 id="zi-dong-qiang-zhi-zhuan-huan">自动强制转换</h1>
+<h2 id="yin-yong-jiang-ji-qiang-zhuan">引用降级强转</h2>
+<p>引用降级强转是一种非常常见的强转操作，它可以将<code>&amp;mut T</code>强转为<code>&amp;T</code>。显然，这种强转总是安全的，因为共享引用会受到更多的限制。</p>
+<p>下面是一个例子，在<code>let z</code>那一行y传进去后变成了<code>&amp;T</code>，另外还有 print_num方法。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">struct </span><span>RefHolder&lt;</span><span style="color:#b48ead;">&#39;a</span><span>&gt; {
+</span><span>    </span><span style="color:#bf616a;">x</span><span>: &amp;</span><span style="color:#b48ead;">&#39;a i64</span><span>,
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl</span><span>&lt;</span><span style="color:#b48ead;">&#39;a</span><span>&gt; RefHolder&lt;</span><span style="color:#b48ead;">&#39;a</span><span>&gt; {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">new</span><span>(</span><span style="color:#bf616a;">x</span><span>: &amp;</span><span style="color:#b48ead;">&#39;a i64</span><span>) -&gt; RefHolder&lt;</span><span style="color:#b48ead;">&#39;a</span><span>&gt; {
+</span><span>        RefHolder { x }
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">print_num</span><span>(</span><span style="color:#bf616a;">y</span><span>: &amp;</span><span style="color:#b48ead;">i64</span><span>) {
+</span><span>    println!(&quot;</span><span style="color:#a3be8c;">y: </span><span style="color:#d08770;">{}</span><span>&quot;, y);
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">main</span><span>() {
+</span><span>	</span><span style="color:#65737e;">// Create `x`
+</span><span>	</span><span style="color:#b48ead;">let mut</span><span> x = </span><span style="color:#d08770;">10</span><span>;
+</span><span>
+</span><span>	</span><span style="color:#65737e;">// Make sure `y` is `&amp;mut i64`.
+</span><span>	</span><span style="color:#b48ead;">let</span><span> y = &amp;</span><span style="color:#b48ead;">mut</span><span> x;
+</span><span>
+</span><span>	</span><span style="color:#65737e;">// Package the downgraded reference into a struct.
+</span><span>	</span><span style="color:#b48ead;">let</span><span> z = RefHolder::new(y);
+</span><span>	
+</span><span>	</span><span style="color:#65737e;">// Print `y` downgrading it to an `&amp;i64`.
+</span><span>	</span><span style="color:#96b5b4;">print_num</span><span>(y);
+</span><span>
+</span><span>	</span><span style="color:#65737e;">// Use the `z` reference again.
+</span><span>	println!(&quot;</span><span style="color:#a3be8c;">z.x: </span><span style="color:#d08770;">{}</span><span>&quot;, z.x);
+</span><span>
+</span><span>	*y = </span><span style="color:#d08770;">3</span><span>;
+</span><span>}
+</span></code></pre>
+<h2 id="deref-coercion">Deref Coercion</h2>
+<p>会利用Deref和DerefMut两个trait的实现来对引用进行转换。会在以下场景自动进行：</p>
+<ol>
+<li>参数传递</li>
+<li>方法调用</li>
+</ol>
+<h2 id="unsized-coercion">Unsized Coercion</h2>
+<p>如下所示，i32的数组会自动转换为 i32的slice，从一个sized转换为一个unsized类型。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>[</span><span style="color:#b48ead;">i32</span><span>; </span><span style="color:#d08770;">3</span><span>] -&gt; [</span><span style="color:#b48ead;">i32</span><span>]
+</span></code></pre>
+<h1 id="zhu-dong-zhuan-huan">主动转换</h1>
+<p>From /To</p>
+<h2 id="from">From</h2>
+<p>Definition</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub trait </span><span>From&lt;T&gt; {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">from</span><span>(T) -&gt; </span><span style="color:#b48ead;">Self</span><span>;
+</span><span>}
+</span></code></pre>
+<p>假如为类型U实现了 <code>From&lt;T&gt;</code>，则可以调用U::from(value:T)来得到类型U的值；同时，可以调用<code>T.into&lt;U&gt;()</code>来将T转换为U类型，类型T的<code>Into&lt;U&gt;</code> trait会被标准库来实现。</p>
+<p>同时也是利用From来进行错误处理，如下代码所述，CliError为我们自己定义的错误，为这个错误实现了From trait，其中泛型参数分别为<code>io::Error</code>和<code>num::ParseIntError</code>两个；这个也意味着 <code>io::Error</code>和<code>num::ParseIntError</code>类型分别实现了<code>Into&lt;CliError&gt;</code> trait。在open_and_parse_file函数中，处理Result&lt;T,E&gt;时，利用?宏来调用对应错误的into方法，编译器推断出可以转换为<code>CliError</code>，这样就实现了简便的错误处理。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">use </span><span>std::fs;
+</span><span style="color:#b48ead;">use </span><span>std::io;
+</span><span style="color:#b48ead;">use </span><span>std::num;
+</span><span>
+</span><span style="color:#b48ead;">enum </span><span>CliError {
+</span><span>    IoError(io::Error),
+</span><span>    ParseError(num::ParseIntError),
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl </span><span>From&lt;io::Error&gt; </span><span style="color:#b48ead;">for </span><span>CliError {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">from</span><span>(</span><span style="color:#bf616a;">error</span><span>: io::Error) -&gt; </span><span style="color:#b48ead;">Self </span><span>{
+</span><span>        CliError::IoError(error)
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl </span><span>From&lt;num::ParseIntError&gt; </span><span style="color:#b48ead;">for </span><span>CliError {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">from</span><span>(</span><span style="color:#bf616a;">error</span><span>: num::ParseIntError) -&gt; </span><span style="color:#b48ead;">Self </span><span>{
+</span><span>        CliError::ParseError(error)
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">open_and_parse_file</span><span>(</span><span style="color:#bf616a;">file_name</span><span>: &amp;</span><span style="color:#b48ead;">str</span><span>) -&gt; Result&lt;</span><span style="color:#b48ead;">i32</span><span>, CliError&gt; {
+</span><span>    </span><span style="color:#b48ead;">let mut</span><span> contents = fs::read_to_string(&amp;file_name)?;
+</span><span>    </span><span style="color:#b48ead;">let</span><span> num: </span><span style="color:#b48ead;">i32 </span><span>= contents.</span><span style="color:#96b5b4;">trim</span><span>().</span><span style="color:#96b5b4;">parse</span><span>()?;
+</span><span>    Ok(num)
+</span><span>}
+</span></code></pre>
+<p>关于强制转换，可以参考：https://rustmagazine.github.io/rust_magazine_2021/chapter_7/coercion_in_rust.html</p>
+
+    </div>
+
+    
+    
+
+    <div class="post-footer">
+        
+            
+                <div class="post-tags">
+                    
+                        <a href="https://harpsword.github.io/tags/rust/">#Rust</a>
+                    
+                </div>
+            
+            
+
+        
+
+    </div>
+
+    
+    
+</article>
+
+
+                </div>
+            </main>
+
+            
+            
+        </div>
+
+      
+          <script type="text/javascript" src="https://harpsword.github.io/even.js" ></script>
+      
+    </body>
+
+</html>

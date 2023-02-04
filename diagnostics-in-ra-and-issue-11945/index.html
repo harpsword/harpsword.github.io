@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+      <!-- Enable responsiveness on mobile devices-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+      <title>yu&#x27;s blog - Diagnositcs Calculation in Rust Analyzer and Issue 11945 Fix Solution</title>
+
+      
+
+      
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/slideout/1.0.1/slideout.min.js"></script>
+          
+      
+
+      
+          <link rel="stylesheet" href="https://harpsword.github.io/site.css">
+          
+      
+
+      
+      
+    </head>
+
+    <body>
+        <div class="container">
+
+            <div id="mobile-navbar" class="mobile-navbar">
+              <div class="mobile-header-logo">
+                <a href="/" class="logo">Yu 的天地</a>
+              </div>
+              <div class="mobile-navbar-icon icon-out">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+
+            <nav id="mobile-menu" class="mobile-menu slideout-menu slideout-menu-left">
+              <ul class="mobile-menu-list">
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                            Home
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                            Categories
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                            Tags
+                        </a>
+                    </li>
+                
+                    <li class="mobile-menu-item">
+                        <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                            About
+                        </a>
+                    </li>
+                
+              </ul>
+            </nav>
+
+            <header id="header">
+                <div class="logo"><a href="https:&#x2F;&#x2F;harpsword.github.io">Yu 的天地</a></div>
+                <nav class="menu">
+                    <ul>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io">
+                                    Home
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;categories">
+                                    Categories
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;tags">
+                                    Tags
+                                </a>
+                            </li>
+                        
+                            <li>
+                                <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;about">
+                                    About
+                                </a>
+                            </li>
+                        
+                    </ul>
+                </nav>
+            </header>
+
+            <main>
+                <div class="content" id="mobile-panel">
+                    
+
+
+<div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content always-active">
+        <nav id="TableOfContents">
+            <ul>
+                
+                <li>
+                    <a href="https://harpsword.github.io/diagnostics-in-ra-and-issue-11945/#bei-jing" class="toc-link">背景</a>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/diagnostics-in-ra-and-issue-11945/#diao-yong-rustcfen-xi-dai-ma" class="toc-link">调用rustc分析代码</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/diagnostics-in-ra-and-issue-11945/#nei-bu-fen-xi-dai-ma" class="toc-link">内部分析代码</a>
+                        </li>
+                        
+                    </ul>
+                    
+                </li>
+                
+                <li>
+                    <a href="https://harpsword.github.io/diagnostics-in-ra-and-issue-11945/#issue-xiang-qing" class="toc-link">Issue 详情</a>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/diagnostics-in-ra-and-issue-11945/#bei-jing-1" class="toc-link">背景</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/diagnostics-in-ra-and-issue-11945/#xiang-xi-li-zi" class="toc-link">详细例子</a>
+                        </li>
+                        
+                        <li>
+                            <a href="https://harpsword.github.io/diagnostics-in-ra-and-issue-11945/#xiu-fu-fang-fa" class="toc-link">修复方法</a>
+                        </li>
+                        
+                    </ul>
+                    
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+<article class="post">
+    
+    <header class="post__header">
+        <h1 class="post__title">
+            <a href="https:&#x2F;&#x2F;harpsword.github.io&#x2F;diagnostics-in-ra-and-issue-11945&#x2F;">Diagnositcs Calculation in Rust Analyzer and Issue 11945 Fix Solution</a>
+        </h1>
+        <div class="post__meta">
+            <span class="post__time">2022-05-18</span>
+            
+        </div>
+    </header>
+
+    <div class="post-content">
+      <h1 id="bei-jing">背景</h1>
+<p>在使用Rust Analyzer(下文中称RA)的过程中，经常会出现某些代码飘红的情况，表示这些代码存在问题。RA通过LSP协议中的publishDiagnositcs接口把代码诊断的结果告诉了VS Code。如下图所示，在这个例子中，函数应该返回<code>String</code>类型，但是返回了一个<code>5</code>，类型不匹配，所以编辑器对<code>5</code>加了一条波浪线。</p>
+<p><img src="/image/ra_diagnostics.png" alt="RA诊断例子" /> </p>
+<p>RA中的诊断信息有两种来源，第一种是调用rustc来分析代码得到，另一种是RA内部代码分析所得。</p>
+<h2 id="diao-yong-rustcfen-xi-dai-ma">调用rustc分析代码</h2>
+<p>RA中调用rustc分析代码的过程可以分为两部分，第一部分是调用相同的库来分析代码，并把结果通过Event的形式发送出去；第二部分在main_loop中，接收到Event之后，发现是Event::Flycheck，则对其分析结果进行转换，转换为lsp::Diagnostic格式后，发送给VS Code。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">enum </span><span>Event {
+</span><span>    Lsp(lsp_server::Message),
+</span><span>    Task(Task),
+</span><span>    Vfs(vfs::loader::Message),
+</span><span>    Flycheck(flycheck::Message),
+</span><span>}
+</span></code></pre>
+<h3 id="diao-yong-rustc">调用 rustc</h3>
+<p>在RA中这一部分代码取名为flycheck，这个是借用了之前emacs中的开源包名。详细的调用flycheck的代码在 crates/flycheck/src/lib.rs, FlycheckActor.run方法。这里的实现常用Actor模式，下面的CargoActor、CargoHandle就是一个例子。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">struct </span><span>CargoActor {
+</span><span>    </span><span style="color:#bf616a;">sender</span><span>: Sender&lt;CargoMessage&gt;,
+</span><span>}
+</span><span style="color:#b48ead;">impl </span><span>CargoActor {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">new</span><span>(</span><span style="color:#bf616a;">sender</span><span>: Sender&lt;CargoMessage&gt;) -&gt; CargoActor {
+</span><span>        CargoActor { sender }
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">run</span><span>(</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">command</span><span>: Command) -&gt; io::Result&lt;()&gt; {
+</span><span>        </span><span style="color:#65737e;">// 实际上的运行代码，运行完成会把数据通过 sender发送出去
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">struct </span><span>CargoHandle {
+</span><span>    </span><span style="color:#bf616a;">thread</span><span>: jod_thread::JoinHandle&lt;io::Result&lt;()&gt;&gt;,
+</span><span>    </span><span style="color:#bf616a;">receiver</span><span>: Receiver&lt;CargoMessage&gt;,
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl </span><span>CargoHandle {
+</span><span>    </span><span style="color:#65737e;">// 负责初始化actor，并提交到作业线程池中，
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">spawn</span><span>(</span><span style="color:#bf616a;">command</span><span>: Command) -&gt; CargoHandle {
+</span><span>        </span><span style="color:#b48ead;">let </span><span>(sender, receiver) = </span><span style="color:#96b5b4;">unbounded</span><span>();
+</span><span>        </span><span style="color:#b48ead;">let</span><span> actor = CargoActor::new(sender);
+</span><span>        </span><span style="color:#b48ead;">let</span><span> thread = jod_thread::Builder::new()
+</span><span>            .</span><span style="color:#96b5b4;">name</span><span>(&quot;</span><span style="color:#a3be8c;">CargoHandle</span><span>&quot;.</span><span style="color:#96b5b4;">to_owned</span><span>())
+</span><span>            .</span><span style="color:#96b5b4;">spawn</span><span>(</span><span style="color:#b48ead;">move </span><span>|| actor.</span><span style="color:#96b5b4;">run</span><span>(command))
+</span><span>            .</span><span style="color:#96b5b4;">expect</span><span>(&quot;</span><span style="color:#a3be8c;">failed to spawn thread</span><span>&quot;);
+</span><span>        CargoHandle { thread, receiver }
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">join</span><span>(</span><span style="color:#bf616a;">self</span><span>) -&gt; io::Result&lt;()&gt; {
+</span><span>        </span><span style="color:#bf616a;">self</span><span>.thread.</span><span style="color:#96b5b4;">join</span><span>()
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<p>也有下面这种，FlycheckHandle、FlycheckActor，FlycheckActor中同时有sender和receiver，receiver负责接收来自Handle的指令，sender负责把结果传到外面。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>#[</span><span style="color:#bf616a;">derive</span><span>(Debug)]
+</span><span style="color:#b48ead;">pub struct </span><span>FlycheckHandle {
+</span><span>    </span><span style="color:#65737e;">// XXX: drop order is significant
+</span><span>    </span><span style="color:#bf616a;">sender</span><span>: Sender&lt;Restart&gt;,
+</span><span>    </span><span style="color:#bf616a;">_thread</span><span>: jod_thread::JoinHandle,
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl </span><span>FlycheckHandle {
+</span><span>    </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">spawn</span><span>(
+</span><span>        </span><span style="color:#bf616a;">id</span><span>: </span><span style="color:#b48ead;">usize</span><span>,
+</span><span>        </span><span style="color:#bf616a;">sender</span><span>: Box&lt;dyn Fn(Message) + Send&gt;,
+</span><span>        </span><span style="color:#bf616a;">config</span><span>: FlycheckConfig,
+</span><span>        </span><span style="color:#bf616a;">workspace_root</span><span>: AbsPathBuf,
+</span><span>    ) -&gt; FlycheckHandle {
+</span><span>        </span><span style="color:#65737e;">// 在这里把 sender给传下去了
+</span><span>        </span><span style="color:#b48ead;">let</span><span> actor = FlycheckActor::new(id, sender, config, workspace_root);
+</span><span>        </span><span style="color:#b48ead;">let </span><span>(sender, receiver) = unbounded::&lt;Restart&gt;();
+</span><span>        </span><span style="color:#65737e;">// 初始化actor，到那时run中传的参数是 receiver
+</span><span>        </span><span style="color:#b48ead;">let</span><span> thread = jod_thread::Builder::new()
+</span><span>            .</span><span style="color:#96b5b4;">name</span><span>(&quot;</span><span style="color:#a3be8c;">Flycheck</span><span>&quot;.</span><span style="color:#96b5b4;">to_owned</span><span>())
+</span><span>            .</span><span style="color:#96b5b4;">spawn</span><span>(</span><span style="color:#b48ead;">move </span><span>|| actor.</span><span style="color:#96b5b4;">run</span><span>(receiver))
+</span><span>            .</span><span style="color:#96b5b4;">expect</span><span>(&quot;</span><span style="color:#a3be8c;">failed to spawn thread</span><span>&quot;);
+</span><span>        FlycheckHandle { sender, _thread: thread }
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#65737e;">/// Schedule a re-start of the cargo check worker.
+</span><span>    </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">update</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>) {
+</span><span>        </span><span style="color:#bf616a;">self</span><span>.sender.</span><span style="color:#96b5b4;">send</span><span>(Restart).</span><span style="color:#96b5b4;">unwrap</span><span>();
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">struct </span><span>FlycheckActor {
+</span><span>    </span><span style="color:#bf616a;">id</span><span>: </span><span style="color:#b48ead;">usize</span><span>,
+</span><span>    </span><span style="color:#bf616a;">sender</span><span>: Box&lt;dyn Fn(Message) + Send&gt;,
+</span><span>    </span><span style="color:#bf616a;">config</span><span>: FlycheckConfig,
+</span><span>    </span><span style="color:#bf616a;">workspace_root</span><span>: AbsPathBuf,
+</span><span>    </span><span style="color:#bf616a;">cargo_handle</span><span>: Option&lt;CargoHandle&gt;,
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">enum </span><span>Event {
+</span><span>    Restart(Restart),
+</span><span>    CheckEvent(Option&lt;CargoMessage&gt;),
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl </span><span>FlycheckActor {
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">new</span><span>(
+</span><span>        </span><span style="color:#bf616a;">id</span><span>: </span><span style="color:#b48ead;">usize</span><span>,
+</span><span>        </span><span style="color:#bf616a;">sender</span><span>: Box&lt;dyn Fn(Message) + Send&gt;,
+</span><span>        </span><span style="color:#bf616a;">config</span><span>: FlycheckConfig,
+</span><span>        </span><span style="color:#bf616a;">workspace_root</span><span>: AbsPathBuf,
+</span><span>    ) -&gt; FlycheckActor {
+</span><span>        FlycheckActor { id, sender, config, workspace_root, cargo_handle: None }
+</span><span>    }
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">progress</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">progress</span><span>: Progress) {
+</span><span>        </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">send</span><span>(Message::Progress { id: </span><span style="color:#bf616a;">self</span><span>.id, progress });
+</span><span>    }
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">next_event</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">inbox</span><span>: &amp;Receiver&lt;Restart&gt;) -&gt; Option&lt;Event&gt; {
+</span><span>        </span><span style="color:#b48ead;">let</span><span> check_chan = </span><span style="color:#bf616a;">self</span><span>.cargo_handle.</span><span style="color:#96b5b4;">as_ref</span><span>().</span><span style="color:#96b5b4;">map</span><span>(|</span><span style="color:#bf616a;">cargo</span><span>| &amp;cargo.receiver);
+</span><span>        select! {
+</span><span>            </span><span style="color:#96b5b4;">recv</span><span>(inbox) -&gt; msg =&gt; msg.</span><span style="color:#96b5b4;">ok</span><span>().</span><span style="color:#96b5b4;">map</span><span>(Event::Restart),
+</span><span>            </span><span style="color:#96b5b4;">recv</span><span>(check_chan.</span><span style="color:#96b5b4;">unwrap_or</span><span>(&amp;</span><span style="color:#96b5b4;">never</span><span>())) -&gt; msg =&gt; Some(Event::CheckEvent(msg.</span><span style="color:#96b5b4;">ok</span><span>())),
+</span><span>        }
+</span><span>    }
+</span><span>    </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">run</span><span>(</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">inbox</span><span>: Receiver&lt;Restart&gt;) {
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h3 id="zhuan-huan">转换</h3>
+<p>RA的main_loop也是一个处理消息的，Flycheck的结果也是通过这种方式传递出来，在main_loop中负责解析并处理对应的EVENT。对应的EVENT处理代码如下所示，在这里只截取了diagnostics的部分，会使用crate::diagnostics::to_proto::map_rust_diagnostic_to_lsp方法来转换diagostics，转换之后保存在self.diagnostics中。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>Event::Flycheck(</span><span style="color:#b48ead;">mut</span><span> task) =&gt; {
+</span><span>    </span><span style="color:#b48ead;">let</span><span> _p = profile::span(&quot;</span><span style="color:#a3be8c;">GlobalState::handle_event/flycheck</span><span>&quot;);
+</span><span>    </span><span style="color:#b48ead;">loop </span><span>{
+</span><span>        </span><span style="color:#b48ead;">match</span><span> task {
+</span><span>            flycheck::Message::AddDiagnostic { workspace_root, diagnostic } =&gt; {
+</span><span>                </span><span style="color:#b48ead;">let</span><span> snap = </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">snapshot</span><span>();
+</span><span>                </span><span style="color:#b48ead;">let</span><span> diagnostics =
+</span><span>                    </span><span style="color:#b48ead;">crate</span><span>::diagnostics::to_proto::map_rust_diagnostic_to_lsp(
+</span><span>                        &amp;</span><span style="color:#bf616a;">self</span><span>.config.</span><span style="color:#96b5b4;">diagnostics_map</span><span>(),
+</span><span>                        &amp;diagnostic,
+</span><span>                        &amp;workspace_root,
+</span><span>                        &amp;snap,
+</span><span>                    );
+</span><span>                </span><span style="color:#b48ead;">for</span><span> diag in diagnostics {
+</span><span>                    </span><span style="color:#b48ead;">match </span><span style="color:#96b5b4;">url_to_file_id</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>.vfs.</span><span style="color:#96b5b4;">read</span><span>().</span><span style="color:#d08770;">0</span><span>, &amp;diag.url) {
+</span><span>                        Ok(file_id) =&gt; </span><span style="color:#bf616a;">self</span><span>.diagnostics.</span><span style="color:#96b5b4;">add_check_diagnostic</span><span>(
+</span><span>                            file_id,
+</span><span>                            diag.diagnostic,
+</span><span>                            diag.fix,
+</span><span>                        ),
+</span><span>                        Err(err) =&gt; {
+</span><span>                            tracing::error!(
+</span><span>                                &quot;</span><span style="color:#a3be8c;">File with cargo diagnostic not found in VFS: {}</span><span>&quot;,
+</span><span>                                err
+</span><span>                            );
+</span><span>                        }
+</span><span>                    };
+</span><span>                }
+</span><span>            }
+</span><span>        }
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<p>RA会在处理Event之后统一查看 self.diagnostics中是否有新数据需要发送到Client，最后这一步对不同diagnositc数据来源是相同的。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">if let </span><span>Some(diagnostic_changes) = </span><span style="color:#bf616a;">self</span><span>.diagnostics.</span><span style="color:#96b5b4;">take_changes</span><span>() {
+</span><span>    </span><span style="color:#b48ead;">for</span><span> file_id in diagnostic_changes {
+</span><span>        </span><span style="color:#b48ead;">let</span><span> db = </span><span style="color:#bf616a;">self</span><span>.analysis_host.</span><span style="color:#96b5b4;">raw_database</span><span>();
+</span><span>        </span><span style="color:#b48ead;">let</span><span> source_root = db.</span><span style="color:#96b5b4;">file_source_root</span><span>(file_id);
+</span><span>        </span><span style="color:#b48ead;">if</span><span> db.</span><span style="color:#96b5b4;">source_root</span><span>(source_root).is_library {
+</span><span>            </span><span style="color:#65737e;">// Only publish diagnostics for files in the workspace, not from crates.io deps
+</span><span>            </span><span style="color:#65737e;">// or the sysroot.
+</span><span>            </span><span style="color:#65737e;">// While theoretically these should never have errors, we have quite a few false
+</span><span>            </span><span style="color:#65737e;">// positives particularly in the stdlib, and those diagnostics would stay around
+</span><span>            </span><span style="color:#65737e;">// forever if we emitted them here.
+</span><span>            </span><span style="color:#b48ead;">continue</span><span>;
+</span><span>        }
+</span><span>
+</span><span>        </span><span style="color:#b48ead;">let</span><span> url = </span><span style="color:#96b5b4;">file_id_to_url</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>.vfs.</span><span style="color:#96b5b4;">read</span><span>().</span><span style="color:#d08770;">0</span><span>, file_id);
+</span><span>        </span><span style="color:#b48ead;">let</span><span> diagnostics = </span><span style="color:#bf616a;">self</span><span>.diagnostics.</span><span style="color:#96b5b4;">diagnostics_for</span><span>(file_id).</span><span style="color:#96b5b4;">cloned</span><span>().</span><span style="color:#96b5b4;">collect</span><span>();
+</span><span>        </span><span style="color:#b48ead;">let</span><span> version = from_proto::vfs_path(&amp;url)
+</span><span>            .</span><span style="color:#96b5b4;">map</span><span>(|</span><span style="color:#bf616a;">path</span><span>| </span><span style="color:#bf616a;">self</span><span>.mem_docs.</span><span style="color:#96b5b4;">get</span><span>(&amp;path).</span><span style="color:#96b5b4;">map</span><span>(|</span><span style="color:#bf616a;">it</span><span>| it.version))
+</span><span>            .</span><span style="color:#96b5b4;">unwrap_or_default</span><span>();
+</span><span>
+</span><span>        </span><span style="color:#bf616a;">self</span><span>.send_notification::&lt;lsp_types::notification::PublishDiagnostics&gt;(
+</span><span>            lsp_types::PublishDiagnosticsParams { uri: url, diagnostics, version },
+</span><span>        );
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h2 id="nei-bu-fen-xi-dai-ma">内部分析代码</h2>
+<p>RA内部的诊断代码同样分为两部分，一部分计算diagnostics，另一部分收到数据后保存到self.diagnostics。</p>
+<h3 id="ji-suan-diagnostics">计算diagnostics</h3>
+<p>对应的入口代码如下所示</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">update_diagnostics</span><span>(&amp;</span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">self</span><span>) {
+</span><span>    </span><span style="color:#b48ead;">let</span><span> subscriptions = </span><span style="color:#bf616a;">self
+</span><span>        .mem_docs
+</span><span>        .</span><span style="color:#96b5b4;">iter</span><span>()
+</span><span>        .</span><span style="color:#96b5b4;">map</span><span>(|</span><span style="color:#bf616a;">path</span><span>| </span><span style="color:#bf616a;">self</span><span>.vfs.</span><span style="color:#96b5b4;">read</span><span>().</span><span style="color:#d08770;">0.</span><span style="color:#96b5b4;">file_id</span><span>(path).</span><span style="color:#96b5b4;">unwrap</span><span>())
+</span><span>        .collect::&lt;Vec&lt;_&gt;&gt;();
+</span><span>
+</span><span>    tracing::trace!(&quot;</span><span style="color:#a3be8c;">updating notifications for {:?}</span><span>&quot;, subscriptions);
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">let</span><span> snapshot = </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">snapshot</span><span>();
+</span><span>    </span><span style="color:#bf616a;">self</span><span>.task_pool.handle.</span><span style="color:#96b5b4;">spawn</span><span>(</span><span style="color:#b48ead;">move </span><span>|| {
+</span><span>        </span><span style="color:#b48ead;">let</span><span> diagnostics = subscriptions
+</span><span>            .</span><span style="color:#96b5b4;">into_iter</span><span>()
+</span><span>            .</span><span style="color:#96b5b4;">filter_map</span><span>(|</span><span style="color:#bf616a;">file_id</span><span>| {
+</span><span>                handlers::publish_diagnostics(&amp;snapshot, file_id)
+</span><span>                    .</span><span style="color:#96b5b4;">map_err</span><span>(|</span><span style="color:#bf616a;">err</span><span>| {
+</span><span>                        </span><span style="color:#b48ead;">if </span><span>!</span><span style="color:#96b5b4;">is_cancelled</span><span>(&amp;*err) {
+</span><span>                            tracing::error!(&quot;</span><span style="color:#a3be8c;">failed to compute diagnostics: {:?}</span><span>&quot;, err);
+</span><span>                        }
+</span><span>                    })
+</span><span>                    .</span><span style="color:#96b5b4;">ok</span><span>()
+</span><span>                    .</span><span style="color:#96b5b4;">map</span><span>(|</span><span style="color:#bf616a;">diags</span><span>| (file_id, diags))
+</span><span>            })
+</span><span>            .collect::&lt;Vec&lt;_&gt;&gt;();
+</span><span>        Task::Diagnostics(diagnostics)
+</span><span>    })
+</span><span>}
+</span></code></pre>
+<p>实际上计算的代码在crates/ide-diagnostics/src/lib.rs, fn diagnostics。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">diagnostics</span><span>(
+</span><span>    </span><span style="color:#bf616a;">db</span><span>: &amp;RootDatabase,
+</span><span>    </span><span style="color:#bf616a;">config</span><span>: &amp;DiagnosticsConfig,
+</span><span>    </span><span style="color:#bf616a;">resolve</span><span>: &amp;AssistResolveStrategy,
+</span><span>    </span><span style="color:#bf616a;">file_id</span><span>: FileId,
+</span><span>) -&gt; Vec&lt;Diagnostic&gt; {
+</span><span>    </span><span style="color:#b48ead;">let</span><span> _p = profile::span(&quot;</span><span style="color:#a3be8c;">diagnostics</span><span>&quot;);
+</span><span>    </span><span style="color:#b48ead;">let</span><span> sema = Semantics::new(db);
+</span><span>    </span><span style="color:#65737e;">// 解析遇到的错误会保存在 parse.errors中
+</span><span>    </span><span style="color:#b48ead;">let</span><span> parse = db.</span><span style="color:#96b5b4;">parse</span><span>(file_id);
+</span><span>    </span><span style="color:#b48ead;">let mut</span><span> res = Vec::new();
+</span><span>
+</span><span>    </span><span style="color:#65737e;">// [#34344] Only take first 128 errors to prevent slowing down editor/ide, the number 128 is chosen arbitrarily.
+</span><span>    </span><span style="color:#65737e;">// 把解析遇到的错误也提取出来
+</span><span>    res.</span><span style="color:#96b5b4;">extend</span><span>(
+</span><span>        parse.</span><span style="color:#96b5b4;">errors</span><span>().</span><span style="color:#96b5b4;">iter</span><span>().</span><span style="color:#96b5b4;">take</span><span>(</span><span style="color:#d08770;">128</span><span>).</span><span style="color:#96b5b4;">map</span><span>(|</span><span style="color:#bf616a;">err</span><span>| {
+</span><span>            Diagnostic::new(&quot;</span><span style="color:#a3be8c;">syntax-error</span><span>&quot;, format!(&quot;</span><span style="color:#a3be8c;">Syntax Error: </span><span style="color:#d08770;">{}</span><span>&quot;, err), err.</span><span style="color:#96b5b4;">range</span><span>())
+</span><span>        }),
+</span><span>    );
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">for</span><span> node in parse.</span><span style="color:#96b5b4;">tree</span><span>().</span><span style="color:#96b5b4;">syntax</span><span>().</span><span style="color:#96b5b4;">descendants</span><span>() {
+</span><span>        handlers::useless_braces::useless_braces(&amp;</span><span style="color:#b48ead;">mut</span><span> res, file_id, &amp;node);
+</span><span>        handlers::field_shorthand::field_shorthand(&amp;</span><span style="color:#b48ead;">mut</span><span> res, file_id, &amp;node);
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">let</span><span> module = sema.</span><span style="color:#96b5b4;">to_module_def</span><span>(file_id);
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">let</span><span> ctx = DiagnosticsContext { config, sema, resolve };
+</span><span>    </span><span style="color:#b48ead;">if</span><span> module.</span><span style="color:#96b5b4;">is_none</span><span>() {
+</span><span>        handlers::unlinked_file::unlinked_file(&amp;ctx, &amp;</span><span style="color:#b48ead;">mut</span><span> res, file_id);
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">let mut</span><span> diags = Vec::new();
+</span><span>    </span><span style="color:#65737e;">// 从各个module开始计算diagnostics
+</span><span>    </span><span style="color:#65737e;">// 在子节点那会根据节点类型调用对应节点的diagnostics方法
+</span><span>    </span><span style="color:#b48ead;">if let </span><span>Some(m) = module {
+</span><span>        m.</span><span style="color:#96b5b4;">diagnostics</span><span>(db, &amp;</span><span style="color:#b48ead;">mut</span><span> diags)
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">for</span><span> diag in diags {
+</span><span>        #[</span><span style="color:#bf616a;">rustfmt</span><span>::</span><span style="color:#bf616a;">skip</span><span>]
+</span><span>        </span><span style="color:#b48ead;">let</span><span> d = </span><span style="color:#b48ead;">match</span><span> diag {
+</span><span>            AnyDiagnostic::BreakOutsideOfLoop(d) =&gt; handlers::break_outside_of_loop::break_outside_of_loop(&amp;ctx, &amp;d),
+</span><span>            </span><span style="color:#65737e;">// ...
+</span><span>            AnyDiagnostic::InvalidDeriveTarget(d) =&gt; handlers::invalid_derive_target::invalid_derive_target(&amp;ctx, &amp;d),
+</span><span>
+</span><span>            AnyDiagnostic::InactiveCode(d) =&gt; </span><span style="color:#b48ead;">match </span><span>handlers::inactive_code::inactive_code(&amp;ctx, &amp;d) {
+</span><span>                Some(it) =&gt; it,
+</span><span>                None =&gt; </span><span style="color:#b48ead;">continue</span><span>,
+</span><span>            }
+</span><span>        };
+</span><span>        res.</span><span style="color:#96b5b4;">push</span><span>(d)
+</span><span>    }
+</span><span>
+</span><span>    res.</span><span style="color:#96b5b4;">retain</span><span>(|</span><span style="color:#bf616a;">d</span><span>| {
+</span><span>        !ctx.config.disabled.</span><span style="color:#96b5b4;">contains</span><span>(d.code.</span><span style="color:#96b5b4;">as_str</span><span>())
+</span><span>            &amp;&amp; !(ctx.config.disable_experimental &amp;&amp; d.experimental)
+</span><span>    });
+</span><span>
+</span><span>    res
+</span><span>}
+</span><span>
+</span><span style="color:#65737e;">// in crates/hir/src/lib.rs
+</span><span style="color:#b48ead;">impl </span><span>Module {
+</span><span>    </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">diagnostics</span><span>(</span><span style="color:#bf616a;">self</span><span>, </span><span style="color:#bf616a;">db</span><span>: &amp;dyn HirDatabase, </span><span style="color:#bf616a;">acc</span><span>: &amp;</span><span style="color:#b48ead;">mut </span><span>Vec&lt;AnyDiagnostic&gt;) {
+</span><span>        </span><span style="color:#b48ead;">let</span><span> _p = profile::span(&quot;</span><span style="color:#a3be8c;">Module::diagnostics</span><span>&quot;).</span><span style="color:#96b5b4;">detail</span><span>(|| {
+</span><span>            format!(&quot;</span><span style="color:#d08770;">{:?}</span><span>&quot;, </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">name</span><span>(db).</span><span style="color:#96b5b4;">map_or</span><span>(&quot;</span><span style="color:#a3be8c;">&lt;unknown&gt;</span><span>&quot;.</span><span style="color:#96b5b4;">into</span><span>(), |</span><span style="color:#bf616a;">name</span><span>| name.</span><span style="color:#96b5b4;">to_string</span><span>()))
+</span><span>        });
+</span><span>        </span><span style="color:#65737e;">// 计算def_map的时候会计算module中item的diagnostics数据
+</span><span>        </span><span style="color:#b48ead;">let</span><span> def_map = </span><span style="color:#bf616a;">self</span><span>.id.</span><span style="color:#96b5b4;">def_map</span><span>(db.</span><span style="color:#96b5b4;">upcast</span><span>());
+</span><span>        </span><span style="color:#b48ead;">for</span><span> diag in def_map.</span><span style="color:#96b5b4;">diagnostics</span><span>() {
+</span><span>            </span><span style="color:#b48ead;">if</span><span> diag.in_module != </span><span style="color:#bf616a;">self</span><span>.id.local_id {
+</span><span>                </span><span style="color:#65737e;">// FIXME: This is accidentally quadratic.
+</span><span>                </span><span style="color:#b48ead;">continue</span><span>;
+</span><span>            }
+</span><span>            </span><span style="color:#96b5b4;">emit_def_diagnostic</span><span>(db, acc, diag);
+</span><span>        }
+</span><span>        </span><span style="color:#65737e;">// 遍历scope内的声明，计算这些声明的 diagnostics
+</span><span>        </span><span style="color:#65737e;">// 底层可能只保存了部分ModuleDef的diagnostics
+</span><span>        </span><span style="color:#b48ead;">for</span><span> decl in </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">declarations</span><span>(db) {
+</span><span>            </span><span style="color:#b48ead;">match</span><span> decl {
+</span><span>                ModuleDef::Module(m) =&gt; {
+</span><span>                    </span><span style="color:#65737e;">// Only add diagnostics from inline modules
+</span><span>                    </span><span style="color:#b48ead;">if</span><span> def_map[m.id.local_id].origin.</span><span style="color:#96b5b4;">is_inline</span><span>() {
+</span><span>                        m.</span><span style="color:#96b5b4;">diagnostics</span><span>(db, acc)
+</span><span>                    }
+</span><span>                }
+</span><span>                
+</span><span>                _ =&gt; acc.</span><span style="color:#96b5b4;">extend</span><span>(decl.</span><span style="color:#96b5b4;">diagnostics</span><span>(db)),
+</span><span>            }
+</span><span>        }
+</span><span>
+</span><span>        </span><span style="color:#65737e;">// 遍历scope内的实现，计算这些实现的 diagnostics
+</span><span>        </span><span style="color:#b48ead;">for</span><span> impl_def in </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">impl_defs</span><span>(db) {
+</span><span>            </span><span style="color:#b48ead;">for</span><span> item in impl_def.</span><span style="color:#96b5b4;">items</span><span>(db) {
+</span><span>                </span><span style="color:#b48ead;">let</span><span> def: DefWithBody = </span><span style="color:#b48ead;">match</span><span> item {
+</span><span>                    AssocItem::Function(it) =&gt; it.</span><span style="color:#96b5b4;">into</span><span>(),
+</span><span>                    AssocItem::Const(it) =&gt; it.</span><span style="color:#96b5b4;">into</span><span>(),
+</span><span>                    AssocItem::TypeAlias(_) =&gt; </span><span style="color:#b48ead;">continue</span><span>,
+</span><span>                };
+</span><span>
+</span><span>                def.</span><span style="color:#96b5b4;">diagnostics</span><span>(db, acc);
+</span><span>            }
+</span><span>        }
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<p>语法验证的代码(crates/syntax/src/validation.rs)</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub</span><span>(</span><span style="color:#b48ead;">crate</span><span>) </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">validate</span><span>(</span><span style="color:#bf616a;">root</span><span>: &amp;SyntaxNode) -&gt; Vec&lt;SyntaxError&gt; {
+</span><span>    </span><span style="color:#65737e;">// FIXME:
+</span><span>    </span><span style="color:#65737e;">// * Add unescape validation of raw string literals and raw byte string literals
+</span><span>    </span><span style="color:#65737e;">// * Add validation of doc comments are being attached to nodes
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">let mut</span><span> errors = Vec::new();
+</span><span>    </span><span style="color:#b48ead;">for</span><span> node in root.</span><span style="color:#96b5b4;">descendants</span><span>() {
+</span><span>        match_ast! {
+</span><span>            </span><span style="color:#b48ead;">match</span><span> node {
+</span><span>                ast::Literal(it) =&gt; </span><span style="color:#96b5b4;">validate_literal</span><span>(it, &amp;</span><span style="color:#b48ead;">mut</span><span> errors),
+</span><span>                ast::Const(it) =&gt; </span><span style="color:#96b5b4;">validate_const</span><span>(it, &amp;</span><span style="color:#b48ead;">mut</span><span> errors),
+</span><span>                ast::BlockExpr(it) =&gt; block::validate_block_expr(it, &amp;</span><span style="color:#b48ead;">mut</span><span> errors),
+</span><span>                ast::FieldExpr(it) =&gt; </span><span style="color:#96b5b4;">validate_numeric_name</span><span>(it.</span><span style="color:#96b5b4;">name_ref</span><span>(), &amp;</span><span style="color:#b48ead;">mut</span><span> errors),
+</span><span>                ast::RecordExprField(it) =&gt; </span><span style="color:#96b5b4;">validate_numeric_name</span><span>(it.</span><span style="color:#96b5b4;">name_ref</span><span>(), &amp;</span><span style="color:#b48ead;">mut</span><span> errors),
+</span><span>                ast::Visibility(it) =&gt; </span><span style="color:#96b5b4;">validate_visibility</span><span>(it, &amp;</span><span style="color:#b48ead;">mut</span><span> errors),
+</span><span>                ast::RangeExpr(it) =&gt; </span><span style="color:#96b5b4;">validate_range_expr</span><span>(it, &amp;</span><span style="color:#b48ead;">mut</span><span> errors),
+</span><span>                ast::PathSegment(it) =&gt; </span><span style="color:#96b5b4;">validate_path_keywords</span><span>(it, &amp;</span><span style="color:#b48ead;">mut</span><span> errors),
+</span><span>                ast::RefType(it) =&gt; </span><span style="color:#96b5b4;">validate_trait_object_ref_ty</span><span>(it, &amp;</span><span style="color:#b48ead;">mut</span><span> errors),
+</span><span>                ast::PtrType(it) =&gt; </span><span style="color:#96b5b4;">validate_trait_object_ptr_ty</span><span>(it, &amp;</span><span style="color:#b48ead;">mut</span><span> errors),
+</span><span>                ast::FnPtrType(it) =&gt; </span><span style="color:#96b5b4;">validate_trait_object_fn_ptr_ret_ty</span><span>(it, &amp;</span><span style="color:#b48ead;">mut</span><span> errors),
+</span><span>                ast::MacroRules(it) =&gt; </span><span style="color:#96b5b4;">validate_macro_rules</span><span>(it, &amp;</span><span style="color:#b48ead;">mut</span><span> errors),
+</span><span>                ast::LetExpr(it) =&gt; </span><span style="color:#96b5b4;">validate_let_expr</span><span>(it, &amp;</span><span style="color:#b48ead;">mut</span><span> errors),
+</span><span>                _ =&gt; (),
+</span><span>            }
+</span><span>        }
+</span><span>    }
+</span><span>    errors
+</span><span>}
+</span></code></pre>
+<h3 id="shu-ju-shou-ji">数据收集</h3>
+<p>和flycheck类似，在main_loop中收到Task::Diagnostics消息后，把对应的disgnostics写入到self.diagnostics中。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span>Event::Task(</span><span style="color:#b48ead;">mut</span><span> task) =&gt; {
+</span><span>    </span><span style="color:#b48ead;">let</span><span> _p = profile::span(&quot;</span><span style="color:#a3be8c;">GlobalState::handle_event/task</span><span>&quot;);
+</span><span>    </span><span style="color:#b48ead;">let mut</span><span> prime_caches_progress = Vec::new();
+</span><span>    </span><span style="color:#b48ead;">loop </span><span>{
+</span><span>        </span><span style="color:#b48ead;">match</span><span> task {
+</span><span>            Task::Response(response) =&gt; </span><span style="color:#bf616a;">self</span><span>.</span><span style="color:#96b5b4;">respond</span><span>(response),
+</span><span>            Task::Diagnostics(diagnostics_per_file) =&gt; {
+</span><span>                </span><span style="color:#b48ead;">for </span><span>(file_id, diagnostics) in diagnostics_per_file {
+</span><span>                    </span><span style="color:#bf616a;">self</span><span>.diagnostics.</span><span style="color:#96b5b4;">set_native_diagnostics</span><span>(file_id, diagnostics)
+</span><span>                }
+</span><span>            }
+</span><span>            </span><span style="color:#65737e;">// ...
+</span><span>        }
+</span><span>        </span><span style="color:#65737e;">// ..
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h1 id="issue-xiang-qing">Issue 详情</h1>
+<h2 id="bei-jing-1">背景</h2>
+<p>出现问题的代码属于flycheck得到的diagnostics转换成lsp_server::diagnostics的过程。在这个过程中，需要将flycheck::Diagnostic中关于问题代码的范围转换为lsp_types::Diagnostic中的Range。VS Code可以采用UTF-8或者UTF-16编码，确定编码之后，编辑器上的字符虽然显示出来只有一个，但是可能会占据多个位置；在UTF-16编码下，一个<code>𐐀</code>会占用两个位置。而flycheck得到的Range都是按照字符来进行计数的，无法直接映射到VS Code的位置。</p>
+<p>另外，RA内部的Offset计算是按照字节进行的。比如一个字符在UTF-8编码下需要两个字节来表示，那么在RA内部这个字符会占用两个位置。</p>
+<h2 id="xiang-xi-li-zi">详细例子</h2>
+<p>在以下示例代码中，存在用UTF-8格式下需要多个字节来表示的字符𐐀，在这种情况下，RA给出的范围是(17, 23)，而实际上应该是(17, 27)。对应的截图<img src="https://user-images.githubusercontent.com/308347/162568089-c6e77199-bc8c-43b7-934b-fd5b19b7c16b.png" alt="图片" /></p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">main</span><span>() {
+</span><span>    </span><span style="color:#b48ead;">let</span><span> x: </span><span style="color:#b48ead;">u32 </span><span>= &quot;</span><span style="color:#a3be8c;">𐐀𐐀𐐀𐐀</span><span>&quot;;
+</span><span>}
+</span></code></pre>
+<h2 id="xiu-fu-fang-fa">修复方法</h2>
+<p>flycheck给的数据格式如下所示，可以利用column和原始的字符串来计算对应的lsp_type::range。</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub struct </span><span>DiagnosticSpan {
+</span><span>    </span><span style="color:#65737e;">/// The file name or the macro name this diagnostic comes from.
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">file_name</span><span>: String,
+</span><span>    </span><span style="color:#65737e;">/// The byte offset in the file where this diagnostic starts from.
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">byte_start</span><span>: </span><span style="color:#b48ead;">u32</span><span>,
+</span><span>    </span><span style="color:#65737e;">/// The byte offset in the file where this diagnostic ends.
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">byte_end</span><span>: </span><span style="color:#b48ead;">u32</span><span>,
+</span><span>    </span><span style="color:#65737e;">/// 1-based. The line in the file.
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">line_start</span><span>: </span><span style="color:#b48ead;">usize</span><span>,
+</span><span>    </span><span style="color:#65737e;">/// 1-based. The line in the file.
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">line_end</span><span>: </span><span style="color:#b48ead;">usize</span><span>,
+</span><span>    </span><span style="color:#65737e;">/// 1-based, character offset.
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">column_start</span><span>: </span><span style="color:#b48ead;">usize</span><span>,
+</span><span>    </span><span style="color:#65737e;">/// 1-based, character offset.
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">column_end</span><span>: </span><span style="color:#b48ead;">usize</span><span>,
+</span><span>    </span><span style="color:#65737e;">/// ...
+</span><span>    </span><span style="color:#65737e;">/// Source text from the start of line_start to the end of line_end.
+</span><span>    </span><span style="color:#b48ead;">pub </span><span style="color:#bf616a;">text</span><span>: Vec&lt;DiagnosticSpanLine&gt;,
+</span><span>}
+</span></code></pre>
+<p>当然需要考虑VS Code这边使用的编码，修改后的代码如下所示:</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#65737e;">/// Converts a Rust span to a LSP location
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">location</span><span>(
+</span><span>    </span><span style="color:#bf616a;">config</span><span>: &amp;DiagnosticsMapConfig,
+</span><span>    </span><span style="color:#bf616a;">workspace_root</span><span>: &amp;AbsPath,
+</span><span>    </span><span style="color:#bf616a;">span</span><span>: &amp;DiagnosticSpan,
+</span><span>    </span><span style="color:#bf616a;">snap</span><span>: &amp;GlobalStateSnapshot,
+</span><span>) -&gt; lsp_types::Location {
+</span><span>    </span><span style="color:#b48ead;">let</span><span> file_name = </span><span style="color:#96b5b4;">resolve_path</span><span>(config, workspace_root, &amp;span.file_name);
+</span><span>    </span><span style="color:#b48ead;">let</span><span> uri = </span><span style="color:#96b5b4;">url_from_abs_path</span><span>(&amp;file_name);
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">let</span><span> range = {
+</span><span>        </span><span style="color:#b48ead;">let</span><span> offset_encoding = snap.config.</span><span style="color:#96b5b4;">offset_encoding</span><span>();
+</span><span>        lsp_types::Range::new(
+</span><span>            </span><span style="color:#96b5b4;">position</span><span>(&amp;offset_encoding, span, span.line_start, span.column_start),
+</span><span>            </span><span style="color:#96b5b4;">position</span><span>(&amp;offset_encoding, span, span.line_end, span.column_end),
+</span><span>        )
+</span><span>    };
+</span><span>    lsp_types::Location::new(uri, range)
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">position</span><span>(
+</span><span>    </span><span style="color:#bf616a;">offset_encoding</span><span>: &amp;OffsetEncoding,
+</span><span>    </span><span style="color:#bf616a;">span</span><span>: &amp;DiagnosticSpan,
+</span><span>    </span><span style="color:#bf616a;">line_offset</span><span>: </span><span style="color:#b48ead;">usize</span><span>,
+</span><span>    </span><span style="color:#bf616a;">column_offset</span><span>: </span><span style="color:#b48ead;">usize</span><span>,
+</span><span>) -&gt; lsp_types::Position {
+</span><span>    </span><span style="color:#b48ead;">let</span><span> line_index = line_offset - span.line_start;
+</span><span>
+</span><span>    </span><span style="color:#b48ead;">let mut</span><span> true_column_offset = column_offset;
+</span><span>    </span><span style="color:#b48ead;">if let </span><span>Some(line) = span.text.</span><span style="color:#96b5b4;">get</span><span>(line_index) {
+</span><span>        </span><span style="color:#b48ead;">if</span><span> line.text.</span><span style="color:#96b5b4;">chars</span><span>().</span><span style="color:#96b5b4;">count</span><span>() == line.text.</span><span style="color:#96b5b4;">len</span><span>() {
+</span><span>            </span><span style="color:#65737e;">// all one byte utf-8 char
+</span><span>            </span><span style="color:#b48ead;">return </span><span>lsp_types::Position {
+</span><span>                line: (line_offset as </span><span style="color:#b48ead;">u32</span><span>).</span><span style="color:#96b5b4;">saturating_sub</span><span>(</span><span style="color:#d08770;">1</span><span>),
+</span><span>                character: (column_offset as </span><span style="color:#b48ead;">u32</span><span>).</span><span style="color:#96b5b4;">saturating_sub</span><span>(</span><span style="color:#d08770;">1</span><span>),
+</span><span>            };
+</span><span>        }
+</span><span>        </span><span style="color:#b48ead;">let mut</span><span> char_offset = </span><span style="color:#d08770;">0</span><span>;
+</span><span>        </span><span style="color:#b48ead;">let</span><span> len_func = </span><span style="color:#b48ead;">match</span><span> offset_encoding {
+</span><span>            OffsetEncoding::Utf8 =&gt; </span><span style="color:#b48ead;">char</span><span>::len_utf8,
+</span><span>            OffsetEncoding::Utf16 =&gt; </span><span style="color:#b48ead;">char</span><span>::len_utf16,
+</span><span>        };
+</span><span>        </span><span style="color:#b48ead;">for</span><span> c in line.text.</span><span style="color:#96b5b4;">chars</span><span>() {
+</span><span>            char_offset += </span><span style="color:#d08770;">1</span><span>;
+</span><span>            </span><span style="color:#b48ead;">if</span><span> char_offset &gt; column_offset {
+</span><span>                </span><span style="color:#b48ead;">break</span><span>;
+</span><span>            }
+</span><span>            true_column_offset += </span><span style="color:#96b5b4;">len_func</span><span>(c) - </span><span style="color:#d08770;">1</span><span>;
+</span><span>        }
+</span><span>    }
+</span><span>
+</span><span>    lsp_types::Position {
+</span><span>        line: (line_offset as </span><span style="color:#b48ead;">u32</span><span>).</span><span style="color:#96b5b4;">saturating_sub</span><span>(</span><span style="color:#d08770;">1</span><span>),
+</span><span>        character: (true_column_offset as </span><span style="color:#b48ead;">u32</span><span>).</span><span style="color:#96b5b4;">saturating_sub</span><span>(</span><span style="color:#d08770;">1</span><span>),
+</span><span>    }
+</span><span>}
+</span></code></pre>
+
+    </div>
+
+    
+    
+
+    <div class="post-footer">
+        
+            
+                <div class="post-tags">
+                    
+                        <a href="https://harpsword.github.io/tags/rust/">#Rust</a>
+                    
+                        <a href="https://harpsword.github.io/tags/rust-analyzer/">#Rust Analyzer</a>
+                    
+                </div>
+            
+            
+
+        
+
+    </div>
+
+    
+    
+</article>
+
+
+                </div>
+            </main>
+
+            
+            
+        </div>
+
+      
+          <script type="text/javascript" src="https://harpsword.github.io/even.js" ></script>
+      
+    </body>
+
+</html>
